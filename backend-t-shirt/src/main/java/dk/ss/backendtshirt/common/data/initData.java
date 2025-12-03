@@ -107,8 +107,6 @@ public class initData implements CommandLineRunner {
                 "Premium Gift T-Shirt - White",
                 "Exclusive gift t-shirt in premium white cotton",
                 "https://example.com/images/gift-white.jpg",
-                "M",
-                "White",
                 200,
                 true
         );
@@ -117,8 +115,6 @@ public class initData implements CommandLineRunner {
                 "Premium Gift T-Shirt - Black",
                 "Exclusive gift t-shirt in premium black cotton",
                 "https://example.com/images/gift-black.jpg",
-                "L",
-                "Black",
                 150,
                 true
         );
@@ -127,8 +123,6 @@ public class initData implements CommandLineRunner {
                 "Limited Edition Gift T-Shirt",
                 "Special limited edition gift t-shirt",
                 "https://example.com/images/gift-limited.jpg",
-                "M",
-                "Blue",
                 50,
                 true
         );
@@ -138,8 +132,6 @@ public class initData implements CommandLineRunner {
                 "Seasonal Gift T-Shirt",
                 "Seasonal gift t-shirt - out of season",
                 "https://example.com/images/gift-seasonal.jpg",
-                "S",
-                "Green",
                 0,
                 false
         );

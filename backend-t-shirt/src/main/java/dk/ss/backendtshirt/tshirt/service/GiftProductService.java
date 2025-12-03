@@ -53,8 +53,6 @@ public class GiftProductService {
         giftProduct.setName(giftProductDetails.getName());
         giftProduct.setDescription(giftProductDetails.getDescription());
         giftProduct.setImageUrl(giftProductDetails.getImageUrl());
-        giftProduct.setSize(giftProductDetails.getSize());
-        giftProduct.setColor(giftProductDetails.getColor());
         giftProduct.setStockQuantity(giftProductDetails.getStockQuantity());
         giftProduct.setActive(giftProductDetails.getActive());
 
@@ -87,4 +85,3 @@ public class GiftProductService {
         giftProductRepository.deleteById(id);
     }
 }
-

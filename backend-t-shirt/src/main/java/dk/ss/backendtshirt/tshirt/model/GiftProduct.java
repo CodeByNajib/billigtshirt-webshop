@@ -4,9 +4,6 @@ import dk.ss.backendtshirt.common.model.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "gift_products")
@@ -22,14 +19,6 @@ public class GiftProduct extends BaseEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @NotBlank(message = "Size is required")
-    @Column(nullable = false)
-    private String size;
-
-    @NotBlank(message = "Color is required")
-    @Column(nullable = false)
-    private String color;
-
     @NotNull(message = "Stock quantity is required")
     @Column(name = "stock_quantity", nullable = false)
     private Integer stockQuantity;
@@ -42,12 +31,10 @@ public class GiftProduct extends BaseEntity {
     }
 
     public GiftProduct(String name, String description, String imageUrl,
-                       String size, String color, Integer stockQuantity, Boolean active) {
+                       Integer stockQuantity, Boolean active) {
         this.name = name;
         this.description = description;
         this.imageUrl = imageUrl;
-        this.size = size;
-        this.color = color;
         this.stockQuantity = stockQuantity;
         this.active = active;
     }
@@ -77,22 +64,6 @@ public class GiftProduct extends BaseEntity {
         this.imageUrl = imageUrl;
     }
 
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
     public Integer getStockQuantity() {
         return stockQuantity;
     }
@@ -109,4 +80,3 @@ public class GiftProduct extends BaseEntity {
         this.active = active;
     }
 }
-
