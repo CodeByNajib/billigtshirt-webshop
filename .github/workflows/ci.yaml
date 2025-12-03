@@ -41,8 +41,10 @@ jobs:
 
       # 5. Compile koden
       - name: Compile code
-        run: backend-t-shirt/mvnw clean compile
+        run: mvnw clean compile
+        working-directory: backend-t-shirt
 
       # 6. Kør tests
       - name: Run tests
-        run: backend-t-shirt/mvnw test
+        run: mvnw test
+        working-directory: backend-t-shirt
