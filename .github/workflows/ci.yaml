@@ -35,16 +35,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-m2
 
-      # 4. Gør mvnw executable
-      - name: Make mvnw executable
-        run: chmod +x backend-t-shirt/mvnw
-
-      # 5. Compile koden
+      # 4. Compile koden
       - name: Compile code
-        run: mvnw clean compile
+        run: mvn clean compile
         working-directory: backend-t-shirt
 
-      # 6. Kør tests
+      # 5. Kør tests
       - name: Run tests
-        run: mvnw test
+        run: mvn test
         working-directory: backend-t-shirt
