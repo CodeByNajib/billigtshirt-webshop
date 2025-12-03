@@ -132,24 +132,4 @@ public class ProductController {
         List<Product> inactiveProducts = productService.getInactiveProducts();
         return ResponseEntity.ok(inactiveProducts);
     }
-
-    /**
-     * Get active products by type (Customer)
-     * GET /api/products/type/{productType}
-     */
-    @GetMapping("/type/{productType}")
-    public ResponseEntity<List<Product>> getActiveProductsByType(@PathVariable Product.ProductType productType) {
-        List<Product> products = productService.getActiveProductsByType(productType);
-        return ResponseEntity.ok(products);
-    }
-
-    /**
-     * Get active gift products only (Customer - for gift selection)
-     * GET /api/products/gifts
-     */
-    @GetMapping("/gifts")
-    public ResponseEntity<List<Product>> getActiveGiftProducts() {
-        List<Product> giftProducts = productService.getActiveGiftProducts();
-        return ResponseEntity.ok(giftProducts);
-    }
 }

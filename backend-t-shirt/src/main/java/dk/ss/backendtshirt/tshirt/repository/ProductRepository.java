@@ -14,15 +14,4 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // Find all inactive products
     List<Product> findByActiveFalse();
-
-    // Find active products by type
-    List<Product> findByActiveTrueAndProductType(Product.ProductType productType);
-
-    // Find all products by type (active and inactive)
-    List<Product> findByProductType(Product.ProductType productType);
-
-    // Default method for finding active gift products
-    default List<Product> findActiveGiftProducts() {
-        return findByActiveTrueAndProductType(Product.ProductType.GIFT);
-    }
 }

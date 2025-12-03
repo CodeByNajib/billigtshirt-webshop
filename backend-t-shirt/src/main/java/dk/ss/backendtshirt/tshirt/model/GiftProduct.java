@@ -9,20 +9,15 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "products")
-public class Product extends BaseEntity {
+@Table(name = "gift_products")
+public class GiftProduct extends BaseEntity {
 
-    @NotBlank(message = "Product name is required")
+    @NotBlank(message = "Gift product name is required")
     @Column(nullable = false)
     private String name;
 
     @Column(length = 1000)
     private String description;
-
-    @NotNull(message = "Price is required")
-    @Positive(message = "Price must be positive")
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
 
     @Column(name = "image_url")
     private String imageUrl;
@@ -43,14 +38,13 @@ public class Product extends BaseEntity {
     private Boolean active = true;
 
     // Constructors
-    public Product() {
+    public GiftProduct() {
     }
 
-    public Product(String name, String description, BigDecimal price, String imageUrl,
-                   String size, String color, Integer stockQuantity, Boolean active) {
+    public GiftProduct(String name, String description, String imageUrl,
+                       String size, String color, Integer stockQuantity, Boolean active) {
         this.name = name;
         this.description = description;
-        this.price = price;
         this.imageUrl = imageUrl;
         this.size = size;
         this.color = color;
@@ -73,14 +67,6 @@ public class Product extends BaseEntity {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
     }
 
     public String getImageUrl() {
@@ -123,3 +109,4 @@ public class Product extends BaseEntity {
         this.active = active;
     }
 }
+

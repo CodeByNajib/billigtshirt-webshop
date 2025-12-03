@@ -1,7 +1,9 @@
 package dk.ss.backendtshirt.common.data;
 
 import dk.ss.backendtshirt.tshirt.model.Product;
+import dk.ss.backendtshirt.tshirt.model.GiftProduct;
 import dk.ss.backendtshirt.tshirt.repository.ProductRepository;
+import dk.ss.backendtshirt.tshirt.repository.GiftProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -12,17 +14,20 @@ import java.math.BigDecimal;
 public class initData implements CommandLineRunner {
 
     private final ProductRepository productRepository;
+    private final GiftProductRepository giftProductRepository;
 
     @Autowired
-    public initData(ProductRepository productRepository) {
+    public initData(ProductRepository productRepository, GiftProductRepository giftProductRepository) {
         this.productRepository = productRepository;
+        this.giftProductRepository = giftProductRepository;
     }
 
     @Override
     public void run(String... args) throws Exception {
         // Only initialize if database is empty
-        if (productRepository.count() == 0) {
+        if (productRepository.count() == 0 && giftProductRepository.count() == 0) {
             initializeProducts();
+            initializeGiftProducts();
         }
     }
 
@@ -36,8 +41,7 @@ public class initData implements CommandLineRunner {
                 "M",
                 "White",
                 100,
-                true,
-                Product.ProductType.REGULAR
+                true
         );
 
         Product product2 = new Product(
@@ -48,8 +52,7 @@ public class initData implements CommandLineRunner {
                 "L",
                 "Black",
                 75,
-                true,
-                Product.ProductType.REGULAR
+                true
         );
 
         Product product3 = new Product(
@@ -60,8 +63,7 @@ public class initData implements CommandLineRunner {
                 "S",
                 "Navy",
                 50,
-                true,
-                Product.ProductType.REGULAR
+                true
         );
 
         Product product4 = new Product(
@@ -72,8 +74,7 @@ public class initData implements CommandLineRunner {
                 "XL",
                 "Red",
                 60,
-                true,
-                Product.ProductType.REGULAR
+                true
         );
 
         // Inactive product (for testing deactivation functionality)
@@ -85,58 +86,7 @@ public class initData implements CommandLineRunner {
                 "M",
                 "Gray",
                 0,
-                false,
-                Product.ProductType.REGULAR
-        );
-
-        // Gift Products (Active)
-        Product gift1 = new Product(
-                "Premium Gift T-Shirt - White",
-                "Exclusive gift t-shirt in premium white cotton",
-                new BigDecimal("0.00"),
-                "https://example.com/images/gift-white.jpg",
-                "M",
-                "White",
-                200,
-                true,
-                Product.ProductType.GIFT
-        );
-
-        Product gift2 = new Product(
-                "Premium Gift T-Shirt - Black",
-                "Exclusive gift t-shirt in premium black cotton",
-                new BigDecimal("0.00"),
-                "https://example.com/images/gift-black.jpg",
-                "L",
-                "Black",
-                150,
-                true,
-                Product.ProductType.GIFT
-        );
-
-        Product gift3 = new Product(
-                "Limited Edition Gift T-Shirt",
-                "Special limited edition gift t-shirt",
-                new BigDecimal("0.00"),
-                "https://example.com/images/gift-limited.jpg",
-                "M",
-                "Blue",
-                50,
-                true,
-                Product.ProductType.GIFT
-        );
-
-        // Inactive gift product (for testing)
-        Product gift4 = new Product(
-                "Seasonal Gift T-Shirt",
-                "Seasonal gift t-shirt - out of season",
-                new BigDecimal("0.00"),
-                "https://example.com/images/gift-seasonal.jpg",
-                "S",
-                "Green",
-                0,
-                false,
-                Product.ProductType.GIFT
+                false
         );
 
         // Save all products
@@ -145,14 +95,62 @@ public class initData implements CommandLineRunner {
         productRepository.save(product3);
         productRepository.save(product4);
         productRepository.save(product5);
-        productRepository.save(gift1);
-        productRepository.save(gift2);
-        productRepository.save(gift3);
-        productRepository.save(gift4);
 
-        System.out.println("✅ Test data initialized: 9 products created (5 regular, 4 gift products)");
+        System.out.println("✅ Regular products initialized: 5 products created");
         System.out.println("   - Active regular products: 4");
         System.out.println("   - Inactive regular products: 1");
+    }
+
+    private void initializeGiftProducts() {
+        // Gift Products (Active)
+        GiftProduct gift1 = new GiftProduct(
+                "Premium Gift T-Shirt - White",
+                "Exclusive gift t-shirt in premium white cotton",
+                "https://example.com/images/gift-white.jpg",
+                "M",
+                "White",
+                200,
+                true
+        );
+
+        GiftProduct gift2 = new GiftProduct(
+                "Premium Gift T-Shirt - Black",
+                "Exclusive gift t-shirt in premium black cotton",
+                "https://example.com/images/gift-black.jpg",
+                "L",
+                "Black",
+                150,
+                true
+        );
+
+        GiftProduct gift3 = new GiftProduct(
+                "Limited Edition Gift T-Shirt",
+                "Special limited edition gift t-shirt",
+                "https://example.com/images/gift-limited.jpg",
+                "M",
+                "Blue",
+                50,
+                true
+        );
+
+        // Inactive gift product (for testing)
+        GiftProduct gift4 = new GiftProduct(
+                "Seasonal Gift T-Shirt",
+                "Seasonal gift t-shirt - out of season",
+                "https://example.com/images/gift-seasonal.jpg",
+                "S",
+                "Green",
+                0,
+                false
+        );
+
+        // Save all gift products
+        giftProductRepository.save(gift1);
+        giftProductRepository.save(gift2);
+        giftProductRepository.save(gift3);
+        giftProductRepository.save(gift4);
+
+        System.out.println("✅ Gift products initialized: 4 gift products created");
         System.out.println("   - Active gift products: 3");
         System.out.println("   - Inactive gift products: 1");
     }

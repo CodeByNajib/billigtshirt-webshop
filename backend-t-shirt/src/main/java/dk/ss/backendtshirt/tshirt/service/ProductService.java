@@ -45,16 +45,6 @@ public class ProductService {
         return productRepository.findByActiveFalse();
     }
 
-    // Get active products by type
-    public List<Product> getActiveProductsByType(Product.ProductType productType) {
-        return productRepository.findByActiveTrueAndProductType(productType);
-    }
-
-    // Get active gift products (for customer gift selection)
-    public List<Product> getActiveGiftProducts() {
-        return productRepository.findActiveGiftProducts();
-    }
-
     // Update product
     public Product updateProduct(Long id, Product productDetails) {
         Product product = productRepository.findById(id)
@@ -68,7 +58,6 @@ public class ProductService {
         product.setColor(productDetails.getColor());
         product.setStockQuantity(productDetails.getStockQuantity());
         product.setActive(productDetails.getActive());
-        product.setProductType(productDetails.getProductType());
 
         return productRepository.save(product);
     }
