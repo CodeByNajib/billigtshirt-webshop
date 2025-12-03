@@ -37,12 +37,12 @@ jobs:
 
       # 4. Gør mvnw executable
       - name: Make mvnw executable
-        run: chmod +x ./mvnw
+        run: chmod +x Backend/mvnw
 
       # 5. Compile koden
       - name: Compile code
-        run: ./mvnw clean compile
+        run: Backend/mvnw clean compile
 
       # 6. Kør tests
       - name: Run tests
-        run: ./mvnw test
+        run: Backend/mvnw test
