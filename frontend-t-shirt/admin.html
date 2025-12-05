@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Beløbsgrænse</title>
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<main class="admin-container">
+    <h1>Admin Panel 🛠️</h1>
+
+    <div class="card">
+        <h3>Indstil grænse for gratis gave</h3>
+
+        <p>Nuværende grænse: <span id="currentThreshold" class="highlight">Indlæser...</span> kr.</p>
+
+        <hr>
+
+        <div class="input-group">
+            <label for="newAmount">Ny beløbsgrænse:</label>
+            <input type="number" id="newAmount" placeholder="F.eks. 500">
+        </div>
+
+        <button id="saveBtn">Gem Ændring</button>
+
+        <p id="message" class="status-message"></p>
+    </div>
+</main>
+
+<script src="admin.js" defer></script>
+</body>
+</html>
