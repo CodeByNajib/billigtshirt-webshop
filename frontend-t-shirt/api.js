@@ -25,11 +25,14 @@ const api = {
 
     async addToCart(productId, quantity = 1) {
         try {
+            const token = localStorage.getItem('authToken');
             const response = await fetch(`${API_BASE_URL}/cart`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : ''
                 },
+                credentials: 'include',
                 body: JSON.stringify({ productId, quantity })
             });
             if (!response.ok) throw new Error('Kunne ikke tilføje til kurv');
@@ -58,14 +61,22 @@ const api = {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include', // Tillad cookies hvis backend bruger dem
                 body: JSON.stringify({ email, password })
             });
-            if (!response.ok) throw new Error('Login fejlede');
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.message || 'Login fejlede');
+            }
+            
             const data = await response.json();
-            //Gem token hvis backend sender en
+            
+            // Gem token hvis backend sender en
             if (data.token) {
                 localStorage.setItem('authToken', data.token);
             }
+            
             return data;
         } catch (error) {
             console.error('Login fejl:', error);
@@ -80,9 +91,16 @@ const api = {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                mode: 'cors',
+                credentials: 'include',
                 body: JSON.stringify(userData)
             });
-            if (!response.ok) throw new Error('Registrering fejlede');
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.message || 'Registrering fejlede');
+            }
+            
             return await response.json();
         } catch (error) {
             console.error('Registrering fejl:', error);

@@ -9,14 +9,14 @@
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <div class="logo">
+            <div class="logo" style="cursor: pointer;" onclick="renderSection('shop')">
                 <span class="logo-icon">T</span>
                 <span class="logo-text">BilligT-Shirt</span>
             </div>
             <ul class="nav-menu">
-                <li><a href="/shop" data-section="shop">Butik</a></li>
-                <li><a href="/collections" data-section="collections">Kollektioner</a></li>
-                <li><a href="/about" data-section="about">Om Os</a></li>
+                <li><a href="#" data-section="shop">Butik</a></li>
+                <li><a href="#" data-section="collections">Kollektioner</a></li>
+                <li><a href="#" data-section="about">Om Os</a></li>
             </ul>
 
             <div class="nav-actions">
@@ -24,9 +24,9 @@
                 <button class="cart-btn">🛒</button>
             </div>
 
-             <ul class="nav-menu">
-                <li><a href="/login" data-section="login">Log ind</a></li>
-                <li><a href="/signup" data-section="signup">Tilmeld</a></li>
+            <ul class="nav-menu" id="auth-menu">
+                <li><a href="#" data-section="login">Log ind</a></li>
+                <li><a href="#" data-section="signup">Tilmeld</a></li>
             </ul> 
         </div>
     </nav>
