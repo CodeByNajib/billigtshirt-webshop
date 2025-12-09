@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/gift-products")
-@CrossOrigin(origins = "*")
+@CrossOrigin(originPatterns = "*", allowCredentials = "true")
 public class GiftProductController {
 
     private final GiftProductService giftProductService;
@@ -133,4 +133,3 @@ public class GiftProductController {
         return ResponseEntity.ok(inactiveGiftProducts);
     }
 }
-

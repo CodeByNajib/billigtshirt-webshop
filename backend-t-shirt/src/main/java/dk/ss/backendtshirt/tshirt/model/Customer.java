@@ -32,7 +32,6 @@ public class Customer {
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<Order> orders = new ArrayList<>();
 
-
     // Vi har også en relation til Cart i vores ERD, men vi venter med den,
     // indtil vi har Cart-klassen helt på plads, så vi ikke får flere fejl nu
 
@@ -125,4 +124,5 @@ public class Customer {
     public void setOrders(List<Order> orders) {
         this.orders = orders;
     }
+
 }
