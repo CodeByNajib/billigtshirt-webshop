@@ -61,7 +61,7 @@ public class initData implements CommandLineRunner {
                 new BigDecimal("109.99"),
                 "https://example.com/images/navy-tshirt.jpg",
                 "S",
-                "Navy",
+                "Blue",
                 50,
                 true
         );

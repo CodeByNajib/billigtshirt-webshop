@@ -40,8 +40,7 @@ public class ProductController {
      */
     @GetMapping("/admin/all")
     public ResponseEntity<List<Product>> getAllProducts() {
-        List<Product> products = productService.getAllProducts();
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(productService.getAllProducts());
     }
 
     /**
@@ -50,9 +49,9 @@ public class ProductController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        return productService.getProductById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        // Bemærk: Ingen .orElse() eller .map() nødvendig mere.
+        // Hvis ID ikke findes, kaster Service en fejl, som GlobalExceptionHandler griber.
+        return ResponseEntity.ok(productService.getProductById(id));
     }
 
     /**
@@ -61,12 +60,8 @@ public class ProductController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody Product productDetails) {
-        try {
-            Product updatedProduct = productService.updateProduct(id, productDetails);
-            return ResponseEntity.ok(updatedProduct);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        // Bemærk: Ingen try-catch. Fejlhåndtering sker automatisk.
+        return ResponseEntity.ok(productService.updateProduct(id, productDetails));
     }
 
     /**
@@ -75,12 +70,7 @@ public class ProductController {
      */
     @PatchMapping("/{id}/deactivate")
     public ResponseEntity<Product> deactivateProduct(@PathVariable Long id) {
-        try {
-            Product deactivatedProduct = productService.deactivateProduct(id);
-            return ResponseEntity.ok(deactivatedProduct);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(productService.deactivateProduct(id));
     }
 
     /**
@@ -89,12 +79,7 @@ public class ProductController {
      */
     @PatchMapping("/{id}/activate")
     public ResponseEntity<Product> activateProduct(@PathVariable Long id) {
-        try {
-            Product activatedProduct = productService.activateProduct(id);
-            return ResponseEntity.ok(activatedProduct);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(productService.activateProduct(id));
     }
 
     /**
@@ -103,24 +88,8 @@ public class ProductController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        try {
-            productService.deleteProduct(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    // Customer endpoints - Only active products
-
-    /**
-     * Get all active products (Customer)
-     * GET /api/products
-     */
-    @GetMapping
-    public ResponseEntity<List<Product>> getActiveProducts() {
-        List<Product> activeProducts = productService.getActiveProducts();
-        return ResponseEntity.ok(activeProducts);
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -129,7 +98,17 @@ public class ProductController {
      */
     @GetMapping("/admin/inactive")
     public ResponseEntity<List<Product>> getInactiveProducts() {
-        List<Product> inactiveProducts = productService.getInactiveProducts();
-        return ResponseEntity.ok(inactiveProducts);
+        return ResponseEntity.ok(productService.getInactiveProducts());
+    }
+
+    // --- CUSTOMER ENDPOINTS ---
+
+    /**
+     * Get all active products (Customer)
+     * GET /api/products
+     */
+    @GetMapping
+    public ResponseEntity<List<Product>> getActiveProducts() {
+        return ResponseEntity.ok(productService.getActiveProducts());
     }
 }

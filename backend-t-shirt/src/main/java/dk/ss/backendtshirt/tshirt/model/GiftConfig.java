@@ -9,27 +9,31 @@ import java.math.BigDecimal;
 public class GiftConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(name = "threshold_amount")
     private BigDecimal thresholdAmount;
+
+    @Column(name = "gift_product_id")
+    private Long giftProductId;
 
     private int active; // 1 = active, 0 = inactive
 
     public GiftConfig() {
     }
 
-    public GiftConfig(int id, BigDecimal thresholdAmount, int active) {
+    public GiftConfig(Long id, BigDecimal thresholdAmount, int active, Long giftProductId) {
         this.id = id;
         this.thresholdAmount = thresholdAmount;
         this.active = active;
+        this.giftProductId = giftProductId;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -47,5 +51,13 @@ public class GiftConfig {
 
     public void setActive(int active) {
         this.active = active;
+    }
+
+    public Long getGiftProductId() {
+        return giftProductId;
+    }
+
+    public void setGiftProductId(Long giftProductId) {
+        this.giftProductId = giftProductId;
     }
 }

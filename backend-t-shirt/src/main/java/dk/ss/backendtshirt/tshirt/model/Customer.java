@@ -12,7 +12,7 @@ public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id") // Matcher vores ERD
-    private int id;
+    private Long id;
 
     private String email;
     private String name;
@@ -41,7 +41,7 @@ public class Customer {
     public Customer() {
     }
 
-    public Customer(int id, String email, String name, String password, String address, String city, String postalCode, String phone, List<Order> orders) {
+    public Customer(Long id, String email, String name, String password, String address, String city, String postalCode, String phone, List<Order> orders) {
         this.id = id;
         this.email = email;
         this.name = name;
@@ -53,11 +53,11 @@ public class Customer {
         this.orders = orders;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
