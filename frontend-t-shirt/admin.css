@@ -61,3 +61,44 @@ button:hover {
     font-weight: bold;
     min-height: 20px; /* Forhindrer hoppen hvis beskeden er tom */
 }
+
+
+
+
+/* --- Stock Status Styles --- */
+
+/* Basic table styling */
+.stock-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.stock-table th, 
+.stock-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.stock-table th {
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* Status Colors - Visual cues for the admin */
+.status-ok {
+    color: #28a745; /* Green */
+    font-weight: bold;
+}
+
+.status-low {
+    color: #fd7e14; /* Orange - Warning */
+    font-weight: bold;
+}
+
+.status-out {
+    color: #dc3545; /* Red - Alert */
+    font-weight: bold;
+    background-color: #fff5f5; /* Light red background for the whole cell */
+}

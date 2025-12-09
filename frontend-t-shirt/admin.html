@@ -9,7 +9,7 @@
 <body>
 
 <main class="admin-container">
-    <h1>Admin Panel 🛠️</h1>
+    <h1>Admin Panel </h1>
 
     <div class="card">
         <h3>Indstil grænse for gratis gave</h3>
@@ -27,6 +27,27 @@
 
         <p id="message" class="status-message"></p>
     </div>
+
+
+    <!--Stock Status-->
+    <div class="card" style="margin-top: 20px;"> 
+        <h3> Lagerstatus på Gaveprodukter</h3>
+        
+        <table class="stock-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Navn</th>
+                    <th>Lager</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="gift-table-body">
+                </tbody>
+        </table>
+    </div>
+
+    
 </main>
 
 <script src="admin.js" defer></script>

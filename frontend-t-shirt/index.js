@@ -95,6 +95,18 @@ const sections = {
         </section>
     `,
 
+    gifts: () => `
+        <section class="collections" style="padding-top: 2rem;">
+            <div class="section-header">
+                <h2>Vælg din Gratis Gave</h2>
+                <p>Som tak for din bestilling kan du vælge en af følgende gaver.</p>
+            </div>
+            <div id="gift-container" class="products-grid">
+                <p style="text-align:center; width:100%;">Indlæser gaver...</p>
+            </div>
+        </section>
+    `,
+
     collections: () => `
         <section class="collections" style="padding-top: 2rem;">
             <div class="section-header">
@@ -281,6 +293,11 @@ function renderSection(sectionName) {
     if (sections[sectionName]) {
         content.innerHTML = sections[sectionName]();
     }
+
+    // If the user navigated to 'gifts', we need to fetch the data
+    if (sectionName === 'gifts') {
+        loadGiftProducts(); 
+    }
     
     // Update active nav link
     document.querySelectorAll('.nav-menu a').forEach(link => {
@@ -400,6 +417,66 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
+
+// Function to fetch and render GIFTS
+async function loadGiftProducts() {
+    const GIFT_API_URL = "http://localhost:8080/api/gift-products"; // Endpoint
+    const container = document.getElementById('gift-container');
+    
+    if (!container) return; // Safety check
+
+    try {
+        const response = await fetch(GIFT_API_URL);
+        const gifts = await response.json();
+
+        // Clear "Loading..." text
+        container.innerHTML = "";
+
+        gifts.forEach(gift => {
+            // 1. Check Stock: Is it <= 0?
+            const isSoldOut = gift.stockQuantity <= 0;
+
+            // 2. CSS Classes:
+            const cardClass = isSoldOut ? 'product-card sold-out' : 'product-card';
+
+            // 3. Button Logic: Disable clicking if sold out
+            const btnState = isSoldOut ? 'disabled style="background-color:#ccc; cursor:not-allowed;"' : '';
+            const btnText = isSoldOut ? 'Ikke på lager' : 'Vælg Gave';
+
+            // 4. Badge Logic: The red sticker
+            const badge = isSoldOut ? '<span class="badge-sold-out">UDSOLGT</span>' : '';
+            
+            // 5. Image Logic: Use your existing helper or fallback
+            const imgHtml = getProductImage(gift); 
+
+            // Build HTML
+            const html = `
+                <div class="${cardClass}" style="position:relative;">
+                    ${badge}
+                    <div class="product-image" style="height:200px;">
+                        ${imgHtml}
+                    </div>
+                    <div class="product-info">
+                        <h3>${gift.name}</h3>
+                        <p>${gift.description || ''}</p>
+                        <div class="product-price">
+                            <span class="price">Lager: ${gift.stockQuantity}</span>
+                            <button class="add-to-cart" onclick="selectGift(${gift.id})" ${btnState}>
+                                ${btnText}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += html;
+        });
+
+    } catch (error) {
+        console.error("Error loading gifts:", error);
+        container.innerHTML = '<p>Kunne ikke hente gaveprodukter.</p>';
+    }
+}
+
 // Opdater navigation baseret på login status
 function updateNavigation() {
     const authMenu = document.getElementById('auth-menu');
@@ -451,3 +528,5 @@ function handleLogout() {
     
     alert('Du er nu logget ud. På gensyn! 👋');
 }
+
+
