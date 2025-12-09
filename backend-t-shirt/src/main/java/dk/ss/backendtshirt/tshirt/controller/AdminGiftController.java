@@ -11,7 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/gift-config")
-@CrossOrigin(origins = "*") // Denne vigtig hvis frontend kører på en anden port
+@CrossOrigin(originPatterns = "*", allowCredentials = "true")
 public class AdminGiftController {
 
 
