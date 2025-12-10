@@ -1,6 +1,8 @@
 package dk.ss.backendtshirt.tshirt.service;
 
 import dk.ss.backendtshirt.common.exception.ResourceNotFoundException;
+import dk.ss.backendtshirt.tshirt.dto.CartDTO;
+import dk.ss.backendtshirt.tshirt.dto.CartItemDTO;
 import dk.ss.backendtshirt.tshirt.model.Cart;
 import dk.ss.backendtshirt.tshirt.model.Product;
 import dk.ss.backendtshirt.tshirt.repository.CartRepository;
@@ -10,6 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -26,7 +32,8 @@ public class CartService {
     }
 
     // Hent eller opret kurv
-    public Cart getCart(Long cartId) { // Bemærk: Skal måske ændres til Integer cartId, hvis din Cart bruger int id
+    public Cart getCart(Long cartId) {
+
         if (cartId == null || cartId == 0) {
             return createNewCart();
         }
@@ -76,5 +83,73 @@ public class CartService {
         Cart cart = getCart(cartId);
         return giftService.checkQualification(cart.getTotalAmount());
     }
+
+
+
+    // METHODS FOR TASK 1.1 & 1.2 (DTO Logic)
+
+    /**
+     * This is the method the Controller should call.
+     * It fetches the Entity -> Converts to DTO -> Returns JSON-ready object.
+     */
+    public CartDTO getCartDetails(Long cartId) {
+        Cart cart = getCart(cartId);
+        return mapToDTO(cart);
+    }
+
+    /**
+     * Helper method: Converts raw DB data into frontend-friendly data.
+     * Groups identical items (e.g. 2x T-Shirts).
+     */
+    public CartDTO mapToDTO(Cart cart) {
+        Map<Long, CartItemDTO> itemMap = new HashMap<>();
+
+        // 1. Group items logic
+        for (Product product : cart.getItems()) {
+            Long id = product.getId();
+
+            if (itemMap.containsKey(id)) {
+                // If item exists, increase quantity
+                CartItemDTO existing = itemMap.get(id);
+                CartItemDTO updated = new CartItemDTO(
+                        existing.getProductName(),
+                        existing.getQuantity() + 1,
+                        existing.getPricePerUnit()
+                );
+                itemMap.put(id, updated);
+            } else {
+                // New item
+                itemMap.put(id, new CartItemDTO(
+                        product.getName(),
+                        1,
+                        product.getPrice()
+                ));
+            }
+        }
+
+        // 2. Create the list for DTO
+        List<CartItemDTO> dtoList = new ArrayList<>(itemMap.values());
+
+        // 3. Create the DTO
+        CartDTO cartDTO = new CartDTO(dtoList, cart.getTotalAmount());
+
+        // --- PREPARE FOR TASK 2 & 3 (Gift Logic) ---
+        // Since you already have giftService injected, we can use it now or later.
+        // For Phase 1, we can leave these purely as placeholders or basic logic:
+
+        // This calculates if they qualify (Task 3)
+        boolean qualifies = giftService.checkQualification(cart.getTotalAmount());
+        cartDTO.setCanSelectFreeGift(qualifies);
+
+        // Task 2: Calculate missing amount (Assuming GiftService has a getLimit() method)
+        // If GiftService doesn't have getLimit() yet, just skip this line for now.
+        // BigDecimal limit = new BigDecimal("400.00");
+        // if (!qualifies) {
+        //    cartDTO.setMissingForFreeGift(limit.subtract(cart.getTotalAmount()));
+        // }
+
+        return cartDTO;
+    }
+
 
 }
