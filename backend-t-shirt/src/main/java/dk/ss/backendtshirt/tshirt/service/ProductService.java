@@ -1,5 +1,6 @@
 package dk.ss.backendtshirt.tshirt.service;
 
+import dk.ss.backendtshirt.common.exception.ResourceNotFoundException;
 import dk.ss.backendtshirt.tshirt.model.Product;
 import dk.ss.backendtshirt.tshirt.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +32,10 @@ public class ProductService {
     }
 
     // Get product by ID
-    public Optional<Product> getProductById(Long id) {
-        return productRepository.findById(id);
+    public Product getProductById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Produkt med id: " + id + " ikke fundet."));
     }
 
     // Get only active products (for customers)
@@ -47,25 +50,27 @@ public class ProductService {
 
     // Update product
     public Product updateProduct(Long id, Product productDetails) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
-
-        product.setName(productDetails.getName());
-        product.setDescription(productDetails.getDescription());
-        product.setPrice(productDetails.getPrice());
-        product.setImageUrl(productDetails.getImageUrl());
-        product.setSize(productDetails.getSize());
-        product.setColor(productDetails.getColor());
-        product.setStockQuantity(productDetails.getStockQuantity());
-        product.setActive(productDetails.getActive());
-
-        return productRepository.save(product);
+        return productRepository.findById(id)
+                .map(product -> {
+                    product.setName(productDetails.getName());
+                    product.setDescription(productDetails.getDescription());
+                    product.setPrice(productDetails.getPrice());
+                    product.setImageUrl(productDetails.getImageUrl());
+                    product.setSize(productDetails.getSize());
+                    product.setColor(productDetails.getColor());
+                    product.setStockQuantity(productDetails.getStockQuantity());
+                    product.setActive(productDetails.getActive());
+                    return productRepository.save(product);
+                })
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Produkt med id: " + id + " ikke fundet."));
     }
 
     // Deactivate product (soft delete - doesn't affect historical orders)
     public Product deactivateProduct(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Produkt med id: " + id + " ikke fundet."));
 
         product.setActive(false);
         return productRepository.save(product);
@@ -74,7 +79,8 @@ public class ProductService {
     // Activate product
     public Product activateProduct(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Produkt med id: " + id + " ikke fundet."));
 
         product.setActive(true);
         return productRepository.save(product);
@@ -83,7 +89,7 @@ public class ProductService {
     // Hard delete (for testing/admin purposes only - be careful with this!)
     public void deleteProduct(Long id) {
         if (!productRepository.existsById(id)) {
-            throw new RuntimeException("Product not found with id: " + id);
+            throw new ResourceNotFoundException("Produkt med id: " + id + " ikke fundet.");
         }
         productRepository.deleteById(id);
     }

@@ -8,7 +8,7 @@ public class OrderGift {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     // Denne binder gaven til ordren
     @ManyToOne
@@ -16,7 +16,7 @@ public class OrderGift {
     private Order order;
 
     @Column(name = "gift_product_id")
-    private int giftProductId;  // ID på det fysiske produkt (kop eller bamse)
+    private Long giftProductId;  // ID på det fysiske produkt (kop eller bamse)
 
     private int available; // 1 eller 0
 
@@ -24,18 +24,18 @@ public class OrderGift {
     public OrderGift() {
     }
 
-    public OrderGift(int id, Order order, int giftProductId, int available) {
+    public OrderGift(Long id, Order order, Long giftProductId, int available) {
         this.id = id;
         this.order = order;
         this.giftProductId = giftProductId;
         this.available = available;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -47,11 +47,11 @@ public class OrderGift {
         this.order = order;
     }
 
-    public int getGiftProductId() {
+    public Long getGiftProductId() {
         return giftProductId;
     }
 
-    public void setGiftProductId(int giftProductId) {
+    public void setGiftProductId(Long giftProductId) {
         this.giftProductId = giftProductId;
     }
 

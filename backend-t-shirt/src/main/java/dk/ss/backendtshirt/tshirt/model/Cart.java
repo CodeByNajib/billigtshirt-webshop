@@ -4,34 +4,73 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "CART")
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(name = "total_amount")
-    private BigDecimal totalAmount;
+    private BigDecimal totalAmount = BigDecimal.ZERO; // Starter på 0
 
     @Column(name = "create_at")
     private LocalDateTime created_At;
 
+    // Relationen til produkterne
+    @ManyToMany
+    @JoinTable(
+            name = "cart_products",
+            joinColumns = @JoinColumn(name = "cart_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private List<Product> items = new ArrayList<>();
+
+    // --- CONSTRUCTORS ---
+
+    // 1. No-Args Constructor (Bruges når man laver en ny tom kurv)
     public Cart() {
+        this.created_At = LocalDateTime.now(); // Sætter tidspunkt automatisk
     }
 
-    public Cart(int id, BigDecimal totalAmount, LocalDateTime created_At) {
+    // 2. All-Args Constructor (Bruges sjældent manuelt, men god at have)
+    public Cart(Long id, BigDecimal totalAmount, LocalDateTime created_At) {
         this.id = id;
         this.totalAmount = totalAmount;
         this.created_At = created_At;
     }
 
-    public int getId() {
+    // --- HJÆLPEMETODER (Logik til kurven) ---
+
+    public void addItem(Product product) {
+        items.add(product);
+        recalculateTotal();
+    }
+
+    public void removeItem(Product product) {
+        items.remove(product);
+        recalculateTotal();
+    }
+
+    // Genberegner totalbeløbet baseret på varerne i listen
+    public void recalculateTotal() {
+        if (items != null) {
+            this.totalAmount = items.stream()
+                    .map(Product::getPrice)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+    }
+
+    // --- GETTERS & SETTERS ---
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -49,5 +88,14 @@ public class Cart {
 
     public void setCreated_At(LocalDateTime created_At) {
         this.created_At = created_At;
+    }
+
+    public List<Product> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Product> items) {
+        this.items = items;
+        recalculateTotal(); // Opdater totalen hvis vi sætter en ny liste
     }
 }
