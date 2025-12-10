@@ -14,5 +14,8 @@ public interface GiftProductRepository extends JpaRepository<GiftProduct, Long> 
 
     // Find all inactive gift products
     List<GiftProduct> findByActiveFalse();
+
+    // Find gift products by active status and stock greater than a specified quantity, like > 0
+    List<GiftProduct> findByActiveAndStockQuantityGreaterThan(Boolean active, Integer stockQuantity);
 }
 

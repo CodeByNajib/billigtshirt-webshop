@@ -98,6 +98,12 @@ public class GiftProductService {
         return giftProductRepository.findByActiveTrue();
     }
 
+    // Get only available gift products. 'true' for active items. '0' for stock greater than 0
+    public List<GiftProduct> getAvailableGiftProducts() {
+        return giftProductRepository.findByActiveAndStockQuantityGreaterThan(true, 0);
+    }
+
+
     // Get inactive gift products
     public List<GiftProduct> getInactiveGiftProducts() {
         return giftProductRepository.findByActiveFalse();

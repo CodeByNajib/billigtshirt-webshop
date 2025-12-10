@@ -1,6 +1,8 @@
 package dk.ss.backendtshirt.tshirt.service;
 
 import dk.ss.backendtshirt.common.exception.ResourceNotFoundException;
+import dk.ss.backendtshirt.tshirt.dto.CartDTO;
+import dk.ss.backendtshirt.tshirt.dto.CartItemDTO;
 import dk.ss.backendtshirt.tshirt.model.Cart;
 import dk.ss.backendtshirt.tshirt.model.Product;
 import dk.ss.backendtshirt.tshirt.repository.CartRepository;
@@ -10,6 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -26,7 +32,8 @@ public class CartService {
     }
 
     // Hent eller opret kurv
-    public Cart getCart(Long cartId) { // Bemærk: Skal måske ændres til Integer cartId, hvis din Cart bruger int id
+    public Cart getCart(Long cartId) {
+
         if (cartId == null || cartId == 0) {
             return createNewCart();
         }
@@ -76,5 +83,61 @@ public class CartService {
         Cart cart = getCart(cartId);
         return giftService.checkQualification(cart.getTotalAmount());
     }
+
+
+
+    // METHODS FOR TASK 1.1 & 1.2 (DTO Logic)
+
+    /**
+     * This is the method the Controller should call.
+     * It fetches the Entity -> Converts to DTO -> Returns JSON-ready object.
+     */
+    public CartDTO getCartDetails(Long cartId) {
+        Cart cart = getCart(cartId);
+        return mapToDTO(cart);
+    }
+
+    /**
+     * Helper method: Converts raw DB data into frontend-friendly data.
+     * Groups identical items (e.g. 2x T-Shirts).
+     */
+    public CartDTO mapToDTO(Cart cart) {
+        Map<Long, CartItemDTO> itemMap = new HashMap<>();
+
+        // --- FIX START: Safety Check ---
+        List<Product> products = cart.getItems();
+        if (products == null) {
+            products = new ArrayList<>(); // Use an empty list instead of null
+        }
+        // --- FIX END ---
+
+        // 1. Group items logic
+        for (Product product : products) {
+            Long id = product.getId();
+
+            if (itemMap.containsKey(id)) {
+                CartItemDTO existing = itemMap.get(id);
+                CartItemDTO updated = new CartItemDTO(
+                        existing.getProductName(),
+                        existing.getQuantity() + 1,
+                        existing.getPricePerUnit()
+                );
+                itemMap.put(id, updated);
+            } else {
+                itemMap.put(id, new CartItemDTO(
+                        product.getName(),
+                        1,
+                        product.getPrice()
+                ));
+            }
+        }
+
+        // 2. Convert to List
+        List<CartItemDTO> dtoList = new ArrayList<>(itemMap.values());
+
+        // 3. Return DTO
+        return new CartDTO(dtoList, cart.getTotalAmount());
+    }
+
 
 }

@@ -62,6 +62,12 @@ public class GiftProductController {
         return ResponseEntity.ok(new GiftProductResponseDTO(giftProduct));
     }
 
+    // Get strictly available products (Stock > 0).Hides sold-out items completely.
+    @GetMapping("/available")
+    public ResponseEntity<List<GiftProduct>> getAvailableGiftProducts() {
+        return ResponseEntity.ok(giftProductService.getAvailableGiftProducts());
+    }
+
     /**
      * Update gift product (Admin)
      * PUT /api/gift-products/{id}
