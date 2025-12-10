@@ -104,12 +104,18 @@ public class CartService {
     public CartDTO mapToDTO(Cart cart) {
         Map<Long, CartItemDTO> itemMap = new HashMap<>();
 
+        // --- FIX START: Safety Check ---
+        List<Product> products = cart.getItems();
+        if (products == null) {
+            products = new ArrayList<>(); // Use an empty list instead of null
+        }
+        // --- FIX END ---
+
         // 1. Group items logic
-        for (Product product : cart.getItems()) {
+        for (Product product : products) {
             Long id = product.getId();
 
             if (itemMap.containsKey(id)) {
-                // If item exists, increase quantity
                 CartItemDTO existing = itemMap.get(id);
                 CartItemDTO updated = new CartItemDTO(
                         existing.getProductName(),
@@ -118,7 +124,6 @@ public class CartService {
                 );
                 itemMap.put(id, updated);
             } else {
-                // New item
                 itemMap.put(id, new CartItemDTO(
                         product.getName(),
                         1,
@@ -127,28 +132,11 @@ public class CartService {
             }
         }
 
-        // 2. Create the list for DTO
+        // 2. Convert to List
         List<CartItemDTO> dtoList = new ArrayList<>(itemMap.values());
 
-        // 3. Create the DTO
-        CartDTO cartDTO = new CartDTO(dtoList, cart.getTotalAmount());
-
-        // --- PREPARE FOR TASK 2 & 3 (Gift Logic) ---
-        // Since you already have giftService injected, we can use it now or later.
-        // For Phase 1, we can leave these purely as placeholders or basic logic:
-
-        // This calculates if they qualify (Task 3)
-        boolean qualifies = giftService.checkQualification(cart.getTotalAmount());
-        cartDTO.setCanSelectFreeGift(qualifies);
-
-        // Task 2: Calculate missing amount (Assuming GiftService has a getLimit() method)
-        // If GiftService doesn't have getLimit() yet, just skip this line for now.
-        // BigDecimal limit = new BigDecimal("400.00");
-        // if (!qualifies) {
-        //    cartDTO.setMissingForFreeGift(limit.subtract(cart.getTotalAmount()));
-        // }
-
-        return cartDTO;
+        // 3. Return DTO
+        return new CartDTO(dtoList, cart.getTotalAmount());
     }
 
 
