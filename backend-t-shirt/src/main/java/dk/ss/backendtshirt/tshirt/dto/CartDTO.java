@@ -8,6 +8,7 @@ public class CartDTO {
     private List<CartItemDTO> items;
     private BigDecimal grandTotal;
 
+
     // Fields for User Story US-K1 (Free Gift)
     private BigDecimal missingForFreeGift;
     private boolean canSelectFreeGift;

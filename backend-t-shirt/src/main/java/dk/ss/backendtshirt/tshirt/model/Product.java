@@ -77,6 +77,23 @@ public class Product extends BaseEntity {
         setColor(colorStr);
     }
 
+    // 4. NY CONSTRUCTOR TIL DATASEEDER (Navn + Pris + Standardværdier)
+    public Product(String name, BigDecimal price) {
+        this.name = name;
+        this.price = price;
+
+        // Da Size, Color og Stock er @NotNull i vores kommende database,
+        // SKAL vi sætte nogle standardværdier her, ellers crasher H2-databasen.
+        this.size = Size.M;           // Standard størrelse
+        this.color = Color.BLACK;     // Standard farve (eller Color.WHITE, hvad du foretrækker)
+        this.stockQuantity = 100;     // Standard lager
+        this.active = true;           // Standard aktiv
+
+        // Sæt tomme værdier for resten for at undgå null pointer exceptions
+        this.description = "Automatisk oprettet produkt";
+        this.imageUrl = "";
+    }
+
     // --- GETTERS & SETTERS ---
     public String getName() {
         return name;

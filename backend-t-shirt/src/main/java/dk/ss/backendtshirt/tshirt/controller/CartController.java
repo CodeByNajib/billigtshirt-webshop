@@ -1,7 +1,6 @@
 package dk.ss.backendtshirt.tshirt.controller;
 
 import dk.ss.backendtshirt.tshirt.dto.CartDTO;
-import dk.ss.backendtshirt.tshirt.model.Cart;
 import dk.ss.backendtshirt.tshirt.service.CartService;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,30 +12,46 @@ import java.util.ArrayList;
 @CrossOrigin(origins = "*") // Allows JS to fetch data
 public class CartController {
 
-    private CartService cartService;
+    private final CartService cartService;
 
     public CartController(CartService cartService){
         this.cartService = cartService;
     }
 
-    // For testing: We will just create a DUMMY cart since we aren't fetching by ID yet
+    // 1. HENT KURV
     @GetMapping
     public CartDTO getCart() {
-        // Phase 1: Simulate User ID 1
         Long fakeUserId = 1L;
 
         try {
-            // Try to find the cart in the DB
             return cartService.getCartDetails(fakeUserId);
-
         } catch (Exception e) {
-            // IF DATABASE FAILS (H2 reset, etc):
-            // Print the REAL error to the console so we can see it
-            System.err.println("⚠️ CART ERROR: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("♻️ Kurv mangler - opretter ny til bruger 1...");
+            cartService.createNewCart();
+            return cartService.getCartDetails(fakeUserId);
+        }
+    }
 
-            // FALLBACK: Don't crash (500). Just return a safe, empty cart.
-            return new CartDTO(new ArrayList<>(), BigDecimal.ZERO);
+    // 2. TILFØJ VARE
+    @PostMapping("/{productId}")
+    public CartDTO addProductToCart(@PathVariable Long productId) {
+        Long fakeUserId = 1L;
+
+        try {
+            System.out.println("➕ Tilføjer produkt " + productId + " til kurv...");
+            cartService.addProductToCart(fakeUserId, productId);
+            return cartService.getCartDetails(fakeUserId);
+        } catch (Exception e) {
+            System.err.println("🔥 Fejl ved tilføjelse: " + e.getMessage());
+
+            // --- HER VAR FEJLEN ---
+            // Vi laver en tom nød-DTO med kun 2 argumenter
+            CartDTO errorCart = new CartDTO(new ArrayList<>(), BigDecimal.ZERO);
+            // Sæt standardværdier for gave-felterne via settere
+            errorCart.setCanSelectFreeGift(false);
+            errorCart.setMissingForFreeGift(BigDecimal.ZERO);
+
+            return errorCart;
         }
     }
 }
