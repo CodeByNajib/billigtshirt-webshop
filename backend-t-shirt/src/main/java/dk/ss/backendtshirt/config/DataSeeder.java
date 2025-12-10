@@ -35,12 +35,12 @@ public class DataSeeder implements CommandLineRunner {
         }
 
         // 2. OPRET GAVE-KONFIGURATION (HVIS TOM)
-        // Det er her, vi fortæller systemet at grænsen er 400 kr
+        // Det er her, vi fortæller systemet at grænsen er 599 kr
         if (giftConfigRepository.count() == 0) {
-            System.out.println("🎁 SEEDING: Sætter gavegrænse til 400 kr...");
+            System.out.println("🎁 SEEDING: Sætter gavegrænse til 599 kr...");
 
             GiftConfig config = new GiftConfig();
-            config.setThresholdAmount(new BigDecimal("400.00")); // Grænsen
+            config.setThresholdAmount(new BigDecimal("599.00")); // Grænsen
             config.setActive(1);                                 // Den er aktiv
             config.setGiftProductId(1L);                         // Gaven er produkt ID 1 (Grøn T-shirt)
 
