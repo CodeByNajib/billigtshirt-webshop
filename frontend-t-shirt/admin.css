@@ -247,14 +247,22 @@
 
 /* Product List in Admin */
 .product-item {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.product-item > div {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 1rem;
-    background: #f9f9f9;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.product-item > div:last-child {
+    border-bottom: none;
 }
 
 .product-item-info {

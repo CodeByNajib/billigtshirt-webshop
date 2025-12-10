@@ -413,31 +413,73 @@ async function loadProductsAdmin() {
         
         const productsList = document.getElementById('products-list');
         if (productsList) {
-            productsList.innerHTML = products.map(product => `
-                <div class="product-item">
-                    <div class="product-item-info">
-                        <strong>${product.name}</strong>
-                        <p>${product.description || 'Ingen beskrivelse'}</p>
-                        <p>Pris: ${product.price} kr | Størrelse: ${product.size} | Farve: ${translateColor(product.color)}</p>
-                        <p>Lager: ${product.stockQuantity} stk | Status: ${product.active ? '<span style="color: green;">✓ Aktiv</span>' : '<span style="color: red;">✗ Inaktiv</span>'}</p>
+            // Opdel produkter i aktive og inaktive
+            const activeProducts = products.filter(p => p.active === 1 || p.active === true);
+            const inactiveProducts = products.filter(p => p.active === 0 || p.active === false);
+            
+            const renderProductTable = (productList, title) => {
+                if (productList.length === 0) {
+                    return `<p style="color: #666; font-style: italic;">Ingen ${title.toLowerCase()} produkter</p>`;
+                }
+                
+                return `
+                    <div class="product-item" style="margin-bottom: 1rem;">
+                        ${productList.map(product => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid #e0e0e0;">
+                                <div class="product-item-info">
+                                    <strong>${product.name}</strong>
+                                    <p style="margin: 0.25rem 0; color: #666;">${product.description || 'Ingen beskrivelse'}</p>
+                                    <p style="margin: 0.25rem 0; font-size: 0.9rem;">
+                                        <strong>Pris:</strong> ${product.price} kr | 
+                                        <strong>Størrelse:</strong> ${product.size} | 
+                                        <strong>Farve:</strong> ${translateColor(product.color)}
+                                    </p>
+                                    <p style="margin: 0.25rem 0; font-size: 0.9rem;">
+                                        <strong>Lager:</strong> ${product.stockQuantity} stk
+                                    </p>
+                                </div>
+                                <div class="product-item-actions">
+                                    <button class="btn-edit" onclick="editProduct(${product.id})">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
+                                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                        </svg>
+                                        Rediger
+                                    </button>
+                                    <button class="btn-delete" onclick="deleteProduct(${product.id})">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
+                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                        </svg>
+                                        Slet
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
                     </div>
-                    <div class="product-item-actions">
-                        <button class="btn-edit" onclick="editProduct(${product.id})">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
-                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-                            </svg>
-                            Rediger
-                        </button>
-                        <button class="btn-delete" onclick="deleteProduct(${product.id})">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
-                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                            </svg>
-                            Slet
-                        </button>
-                    </div>
+                `;
+            };
+            
+            productsList.innerHTML = `
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: #4a8c4a; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                        </svg>
+                        Aktive Produkter (${activeProducts.length})
+                    </h4>
+                    ${renderProductTable(activeProducts, 'Aktive')}
                 </div>
-            `).join('');
+                
+                <div>
+                    <h4 style="color: #d32f2f; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                        Inaktive Produkter (${inactiveProducts.length})
+                    </h4>
+                    ${renderProductTable(inactiveProducts, 'Inaktive')}
+                </div>
+            `;
         }
     } catch (error) {
         console.error('Fejl ved hentning af produkter:', error);
@@ -497,18 +539,34 @@ function setupProductForm() {
             }
             
             try {
-                const response = await fetch(PRODUCTS_API_URL, {
-                    method: 'POST',
+                // Check om vi er i edit mode
+                const editId = form.dataset.editId;
+                const method = editId ? 'PUT' : 'POST';
+                const url = editId ? `${PRODUCTS_API_URL}/${editId}` : PRODUCTS_API_URL;
+                
+                const response = await fetch(url, {
+                    method: method,
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(productData)
                 });
                 
                 if (response.ok) {
-                    showProductMessage('Produkt oprettet succesfuldt!', 'green');
+                    showProductMessage(editId ? 'Produkt opdateret succesfuldt!' : 'Produkt oprettet succesfuldt!', 'green');
                     form.reset();
+                    delete form.dataset.editId; // Fjern edit mode
+                    
+                    // Reset knap tekst
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    submitBtn.textContent = 'Opret Produkt';
+                    
                     loadProductsAdmin();
+                    
+                    // Skift til inventory tab efter opdatering
+                    if (editId) {
+                        setTimeout(() => showProductTab('inventory'), 1000);
+                    }
                 } else {
-                    showProductMessage('Fejl ved oprettelse af produkt', 'red');
+                    showProductMessage(editId ? 'Fejl ved opdatering af produkt' : 'Fejl ved oprettelse af produkt', 'red');
                 }
             } catch (error) {
                 console.error('Fejl:', error);
@@ -538,9 +596,44 @@ async function deleteProduct(id) {
     }
 }
 
-function editProduct(id) {
-    // TODO: Implementer edit funktionalitet
-    alert('Edit funktionalitet kommer snart!');
+async function editProduct(id) {
+    try {
+        // Hent produkt data
+        const response = await fetch(`${PRODUCTS_API_URL}/${id}`);
+        if (!response.ok) throw new Error('Kunne ikke hente produkt');
+        const product = await response.json();
+
+        // Skift til create tab
+        showProductTab('create');
+
+        // Vent lidt så tab'en kan blive synlig
+        setTimeout(() => {
+            // Udfyld form med eksisterende data
+            document.getElementById('product-name').value = product.name || '';
+            document.getElementById('product-description').value = product.description || '';
+            document.getElementById('product-price').value = product.price || '';
+            document.getElementById('product-size').value = product.size || '';
+            document.getElementById('product-color').value = product.color || '';
+            document.getElementById('product-stock').value = product.stockQuantity || '';
+            document.getElementById('product-image').value = product.imageUrl || '';
+            document.getElementById('product-active').checked = (product.active === 1 || product.active === true);
+
+            // Opdater form til edit mode
+            const form = document.getElementById('createProductForm');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.textContent = 'Opdater Produkt';
+            
+            // Gem product ID for opdatering
+            form.dataset.editId = id;
+            
+            // Scroll til toppen
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 100);
+        
+    } catch (error) {
+        console.error('Fejl ved edit af produkt:', error);
+        showProductMessage('Kunne ikke hente produkt til redigering', 'red');
+    }
 }
 
 function showProductMessage(text, color) {
@@ -775,30 +868,68 @@ async function loadGiftProductsAdmin() {
         
         const giftsList = document.getElementById('gifts-list');
         if (giftsList) {
-            giftsList.innerHTML = giftProducts.map(gift => `
-                <div class="product-item">
-                    <div class="product-item-info">
-                        <strong>${gift.name}</strong>
-                        <p>${gift.description || 'Ingen beskrivelse'}</p>
-                        <p>Lager: ${gift.stockQuantity} stk | Status: ${gift.active ? '<span style="color: green;">✓ Aktiv</span>' : '<span style="color: red;">✗ Inaktiv</span>'}</p>
+            // Opdel gave produkter i aktive og inaktive
+            const activeGifts = giftProducts.filter(g => g.active === 1 || g.active === true);
+            const inactiveGifts = giftProducts.filter(g => g.active === 0 || g.active === false);
+            
+            const renderGiftTable = (giftList, title) => {
+                if (giftList.length === 0) {
+                    return `<p style="color: #666; font-style: italic;">Ingen ${title.toLowerCase()} gave produkter</p>`;
+                }
+                
+                return `
+                    <div class="product-item" style="margin-bottom: 1rem;">
+                        ${giftList.map(gift => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid #e0e0e0;">
+                                <div class="product-item-info">
+                                    <strong>${gift.name}</strong>
+                                    <p style="margin: 0.25rem 0; color: #666;">${gift.description || 'Ingen beskrivelse'}</p>
+                                    <p style="margin: 0.25rem 0; font-size: 0.9rem;">
+                                        <strong>Lager:</strong> ${gift.stockQuantity} stk
+                                    </p>
+                                </div>
+                                <div class="product-item-actions">
+                                    <button class="btn-edit" onclick="editGiftProduct(${gift.id})">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
+                                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                        </svg>
+                                        Rediger
+                                    </button>
+                                    <button class="btn-delete" onclick="deleteGiftProduct(${gift.id})">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
+                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                        </svg>
+                                        Slet
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
                     </div>
-                    <div class="product-item-actions">
-                        <button class="btn-edit" onclick="editGiftProduct(${gift.id})">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
-                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-                            </svg>
-                            Rediger
-                        </button>
-                        <button class="btn-delete" onclick="deleteGiftProduct(${gift.id})">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
-                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                            </svg>
-                            Slet
-                        </button>
-                    </div>
+                `;
+            };
+            
+            giftsList.innerHTML = `
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: #4a8c4a; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                        </svg>
+                        Aktive Gave Produkter (${activeGifts.length})
+                    </h4>
+                    ${renderGiftTable(activeGifts, 'Aktive')}
                 </div>
-            `).join('');
+                
+                <div>
+                    <h4 style="color: #d32f2f; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                        Inaktive Gave Produkter (${inactiveGifts.length})
+                    </h4>
+                    ${renderGiftTable(inactiveGifts, 'Inaktive')}
+                </div>
+            `;
         }
     } catch (error) {
         console.error('Fejl ved hentning af gave produkter:', error);
@@ -833,18 +964,34 @@ function setupGiftProductForm() {
             }
             
             try {
-                const response = await fetch(GIFT_PRODUCTS_API_URL, {
-                    method: 'POST',
+                // Check om vi er i edit mode
+                const editId = form.dataset.editId;
+                const method = editId ? 'PUT' : 'POST';
+                const url = editId ? `${GIFT_PRODUCTS_API_URL}/${editId}` : GIFT_PRODUCTS_API_URL;
+                
+                const response = await fetch(url, {
+                    method: method,
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(giftData)
                 });
                 
                 if (response.ok) {
-                    showGiftMessage('Gave produkt oprettet succesfuldt!', 'green');
+                    showGiftMessage(editId ? 'Gave produkt opdateret succesfuldt!' : 'Gave produkt oprettet succesfuldt!', 'green');
                     form.reset();
+                    delete form.dataset.editId; // Fjern edit mode
+                    
+                    // Reset knap tekst
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    submitBtn.textContent = 'Opret Gave Produkt';
+                    
                     loadGiftProductsAdmin();
+                    
+                    // Skift til inventory tab efter opdatering
+                    if (editId) {
+                        setTimeout(() => showGiftTab('inventory'), 1000);
+                    }
                 } else {
-                    showGiftMessage('Fejl ved oprettelse af gave produkt', 'red');
+                    showGiftMessage(editId ? 'Fejl ved opdatering af gave produkt' : 'Fejl ved oprettelse af gave produkt', 'red');
                 }
             } catch (error) {
                 console.error('Fejl:', error);
@@ -874,9 +1021,41 @@ async function deleteGiftProduct(id) {
     }
 }
 
-function editGiftProduct(id) {
-    // TODO: Implementer edit funktionalitet
-    alert('Edit funktionalitet kommer snart!');
+async function editGiftProduct(id) {
+    try {
+        // Hent gave produkt data
+        const response = await fetch(`${GIFT_PRODUCTS_API_URL}/${id}`);
+        if (!response.ok) throw new Error('Kunne ikke hente gave produkt');
+        const giftProduct = await response.json();
+
+        // Skift til create tab
+        showGiftTab('create');
+
+        // Vent lidt så tab'en kan blive synlig
+        setTimeout(() => {
+            // Udfyld form med eksisterende data
+            document.getElementById('gift-name').value = giftProduct.name || '';
+            document.getElementById('gift-description').value = giftProduct.description || '';
+            document.getElementById('gift-stock').value = giftProduct.stockQuantity || '';
+            document.getElementById('gift-image').value = giftProduct.imageUrl || '';
+            document.getElementById('gift-active').checked = (giftProduct.active === 1 || giftProduct.active === true);
+
+            // Opdater form til edit mode
+            const form = document.getElementById('createGiftForm');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.textContent = 'Opdater Gave Produkt';
+            
+            // Gem gift product ID for opdatering
+            form.dataset.editId = id;
+            
+            // Scroll til toppen
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 100);
+        
+    } catch (error) {
+        console.error('Fejl ved edit af gave produkt:', error);
+        showGiftMessage('Kunne ikke hente gave produkt til redigering', 'red');
+    }
 }
 
 function showGiftMessage(text, color) {
@@ -960,9 +1139,112 @@ async function deleteCustomer(id) {
     }
 }
 
-function editCustomer(id) {
-    // TODO: Implementer edit funktionalitet
-    alert('Edit funktionalitet kommer snart!');
+async function editCustomer(id) {
+    try {
+        // Hent kunde data
+        const response = await fetch(`${CUSTOMERS_API_URL}/${id}`);
+        if (!response.ok) throw new Error('Kunne ikke hente kunde');
+        const customer = await response.json();
+
+        // Opret modal dialog
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        `;
+        
+        modal.innerHTML = `
+            <div style="background: white; padding: 2rem; border-radius: 8px; max-width: 500px; width: 90%;">
+                <h3 style="margin-top: 0;">Rediger Kunde</h3>
+                <form id="editCustomerForm">
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Fornavn *</label>
+                        <input type="text" id="edit-firstname" value="${customer.firstname || customer.name?.split(' ')[0] || ''}" 
+                               style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" required>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Efternavn *</label>
+                        <input type="text" id="edit-lastname" value="${customer.lastname || customer.name?.split(' ')[1] || ''}" 
+                               style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" required>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email *</label>
+                        <input type="email" id="edit-email" value="${customer.email || ''}" 
+                               style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" required>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Telefon</label>
+                        <input type="text" id="edit-phone" value="${customer.phone || ''}" 
+                               style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Adresse</label>
+                        <input type="text" id="edit-address" value="${customer.address || ''}" 
+                               style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    </div>
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                        <button type="button" class="btn-secondary" onclick="this.closest('.modal-wrapper').remove()">Annuller</button>
+                        <button type="submit" class="btn-primary">Gem Ændringer</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        
+        modal.className = 'modal-wrapper';
+        document.body.appendChild(modal);
+        
+        // Håndter form submission
+        const form = document.getElementById('editCustomerForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const updatedCustomer = {
+                firstname: document.getElementById('edit-firstname').value,
+                lastname: document.getElementById('edit-lastname').value,
+                email: document.getElementById('edit-email').value,
+                phone: document.getElementById('edit-phone').value,
+                address: document.getElementById('edit-address').value
+            };
+            
+            try {
+                const updateResponse = await fetch(`${CUSTOMERS_API_URL}/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedCustomer)
+                });
+                
+                if (updateResponse.ok) {
+                    alert('Kunde opdateret succesfuldt!');
+                    modal.remove();
+                    loadCustomers();
+                } else {
+                    alert('Fejl ved opdatering af kunde');
+                }
+            } catch (error) {
+                console.error('Fejl:', error);
+                alert('Netværksfejl');
+            }
+        });
+        
+        // Luk modal ved klik udenfor
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+        
+    } catch (error) {
+        console.error('Fejl ved edit af kunde:', error);
+        alert('Kunne ikke hente kunde til redigering');
+    }
 }
 
 // ============ TAB NAVIGATION ============
