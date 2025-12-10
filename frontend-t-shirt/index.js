@@ -37,10 +37,12 @@ function getProductImage(product) {
         return product.icon;
     } else {
         return `<svg width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M50 15L40 30H60L50 15Z" fill="#2d5f2e" opacity="0.3"/>
-            <rect x="35" y="30" width="30" height="40" rx="2" fill="#2d5f2e" opacity="0.5"/>
-            <rect x="25" y="35" width="50" height="25" rx="2" fill="#2d5f2e" opacity="0.4"/>
-            <path d="M25 60L35 85H65L75 60" stroke="#2d5f2e" stroke-width="2" fill="none"/>
+            <!-- T-shirt outline -->
+            <path d="M30 20 L25 15 L20 20 L20 35 L30 35 Z" fill="#2d5f2e" opacity="0.8"/>
+            <path d="M70 20 L75 15 L80 20 L80 35 L70 35 Z" fill="#2d5f2e" opacity="0.8"/>
+            <rect x="30" y="20" width="40" height="50" rx="3" fill="#2d5f2e" opacity="0.9"/>
+            <rect x="35" y="25" width="30" height="40" fill="white" opacity="0.2"/>
+            <circle cx="50" cy="45" r="8" fill="white" opacity="0.3"/>
         </svg>`;
     }
 }
@@ -62,10 +64,23 @@ const sections = {
                 <div class="hero-image">
                     <div class="hero-image-placeholder">
                         <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M100 30L80 60H120L100 30Z" fill="#2d5f2e" opacity="0.3"/>
-                            <rect x="70" y="60" width="60" height="80" rx="5" fill="#2d5f2e" opacity="0.5"/>
-                            <rect x="50" y="70" width="100" height="50" rx="5" fill="#2d5f2e" opacity="0.4"/>
-                            <path d="M50 120L70 170H130L150 120" stroke="#2d5f2e" stroke-width="3" fill="none"/>
+                            <!-- Professional T-shirt illustration -->
+                            <defs>
+                                <linearGradient id="tshirtGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#4a8c4a;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#2d5f2e;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <!-- Sleeves -->
+                            <path d="M60 50 L40 40 L30 50 L30 80 L60 80 Z" fill="url(#tshirtGradient)" opacity="0.9"/>
+                            <path d="M140 50 L160 40 L170 50 L170 80 L140 80 Z" fill="url(#tshirtGradient)" opacity="0.9"/>
+                            <!-- Body -->
+                            <rect x="60" y="50" width="80" height="100" rx="5" fill="url(#tshirtGradient)"/>
+                            <!-- Collar -->
+                            <ellipse cx="100" cy="50" rx="15" ry="8" fill="#2d5f2e"/>
+                            <!-- Design accent -->
+                            <circle cx="100" cy="95" r="20" fill="white" opacity="0.2"/>
+                            <path d="M85 95 L95 105 L115 85" stroke="white" stroke-width="3" opacity="0.3" fill="none" stroke-linecap="round"/>
                         </svg>
                     </div>
                 </div>
@@ -142,12 +157,11 @@ const sections = {
                     <div class="feature">
                         <div class="feature-icon">
                             <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M30 10L25 20L30 50L35 20L30 10Z" fill="#2d5f2e" opacity="0.3"/>
-                                <circle cx="20" cy="25" r="3" fill="#2d5f2e"/>
-                                <circle cx="40" cy="25" r="3" fill="#2d5f2e"/>
-                                <circle cx="25" cy="35" r="2" fill="#2d5f2e"/>
-                                <circle cx="35" cy="35" r="2" fill="#2d5f2e"/>
-                                <path d="M28 45C28 45 30 48 32 45" stroke="#2d5f2e" stroke-width="2"/>
+                                <!-- Leaf icon for organic -->
+                                <path d="M30 10 Q15 15 15 30 Q15 45 30 50 Q30 45 30 30 Z" fill="#2d5f2e" opacity="0.7"/>
+                                <path d="M30 10 Q45 15 45 30 Q45 45 30 50" fill="#4a8c4a" opacity="0.5"/>
+                                <path d="M30 15 Q30 25 30 50" stroke="#2d5f2e" stroke-width="2"/>
+                                <circle cx="30" cy="30" r="18" stroke="#2d5f2e" stroke-width="2" fill="none" opacity="0.5"/>
                             </svg>
                         </div>
                         <h3>100% Økologisk</h3>
@@ -156,10 +170,13 @@ const sections = {
                     <div class="feature">
                         <div class="feature-icon">
                             <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M30 10L20 25L30 30L40 25L30 10Z" stroke="#2d5f2e" stroke-width="2" fill="none"/>
-                                <path d="M20 25L20 35L30 40L40 35L40 25" stroke="#2d5f2e" stroke-width="2" fill="none"/>
-                                <path d="M30 30L30 40" stroke="#2d5f2e" stroke-width="2"/>
-                                <circle cx="30" cy="45" r="5" stroke="#2d5f2e" stroke-width="2" fill="none"/>
+                                <!-- Recycle icon -->
+                                <path d="M30 15 L25 25 L35 25 Z" fill="#2d5f2e"/>
+                                <path d="M20 40 L15 30 L25 35 Z" fill="#2d5f2e"/>
+                                <path d="M40 40 L45 30 L35 35 Z" fill="#2d5f2e"/>
+                                <path d="M30 20 A12 12 0 0 1 40 35" stroke="#4a8c4a" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                <path d="M20 35 A12 12 0 0 1 25 20" stroke="#4a8c4a" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                <path d="M35 35 A12 12 0 0 1 30 20" stroke="#4a8c4a" stroke-width="3" fill="none" stroke-linecap="round"/>
                             </svg>
                         </div>
                         <h3>Bæredygtig</h3>
@@ -168,8 +185,12 @@ const sections = {
                     <div class="feature">
                         <div class="feature-icon">
                             <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <polygon points="30,10 35,25 50,25 38,35 42,50 30,40 18,50 22,35 10,25 25,25" fill="#2d5f2e" opacity="0.5"/>
-                                <polygon points="30,10 35,25 50,25 38,35 42,50 30,40 18,50 22,35 10,25 25,25" stroke="#2d5f2e" stroke-width="2" fill="none"/>
+                                <!-- Award/medal icon -->
+                                <circle cx="30" cy="25" r="12" fill="#4a8c4a" opacity="0.7"/>
+                                <circle cx="30" cy="25" r="12" stroke="#2d5f2e" stroke-width="2" fill="none"/>
+                                <path d="M22 30 L18 45 L24 42 L30 48 L30 37" fill="#2d5f2e" opacity="0.6"/>
+                                <path d="M38 30 L42 45 L36 42 L30 48 L30 37" fill="#2d5f2e" opacity="0.6"/>
+                                <text x="30" y="30" text-anchor="middle" fill="white" font-size="16" font-weight="bold">★</text>
                             </svg>
                         </div>
                         <h3>Premium Kvalitet</h3>
@@ -178,8 +199,11 @@ const sections = {
                     <div class="feature">
                         <div class="feature-icon">
                             <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M30 15C30 15 20 20 20 30C20 40 30 45 30 45C30 45 40 40 40 30C40 20 30 15 30 15Z" stroke="#2d5f2e" stroke-width="2" fill="#2d5f2e" opacity="0.3"/>
-                                <path d="M25 28L28 32L35 23" stroke="#2d5f2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <!-- Price tag icon -->
+                                <path d="M15 15 L15 30 L30 45 L45 30 L30 15 Z" fill="#4a8c4a" opacity="0.6"/>
+                                <path d="M15 15 L15 30 L30 45 L45 30 L30 15 Z" stroke="#2d5f2e" stroke-width="2" fill="none"/>
+                                <circle cx="22" cy="22" r="3" fill="white"/>
+                                <text x="30" y="32" text-anchor="middle" fill="white" font-size="14" font-weight="bold">kr</text>
                             </svg>
                         </div>
                         <h3>Fair Priser</h3>
@@ -197,9 +221,11 @@ const sections = {
                     <div class="auth-header">
                         <div class="auth-icon">
                             <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="30" cy="30" r="28" stroke="#2d5f2e" stroke-width="3"/>
-                                <circle cx="30" cy="22" r="8" fill="#2d5f2e"/>
-                                <path d="M15 48C15 40 21 35 30 35C39 35 45 40 45 48" stroke="#2d5f2e" stroke-width="3" stroke-linecap="round"/>
+                                <!-- Professional user icon -->
+                                <circle cx="30" cy="30" r="26" fill="#e8f5e9"/>
+                                <circle cx="30" cy="30" r="26" stroke="#2d5f2e" stroke-width="2"/>
+                                <circle cx="30" cy="23" r="8" fill="#2d5f2e"/>
+                                <path d="M15 46C15 38 21 33 30 33C39 33 45 38 45 46" stroke="#2d5f2e" stroke-width="2.5" stroke-linecap="round"/>
                             </svg>
                         </div>
                         <h2>Log ind</h2>
@@ -238,10 +264,14 @@ const sections = {
                     <div class="auth-header">
                         <div class="auth-icon">
                             <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20 50V48C20 43 22 40 30 40C38 40 40 43 40 48V50" stroke="#2d5f2e" stroke-width="3" stroke-linecap="round"/>
-                                <path d="M30 10L25 20H35L30 10Z" fill="#2d5f2e"/>
-                                <rect x="25" y="20" width="10" height="15" rx="1" fill="#2d5f2e"/>
-                                <rect x="20" y="24" width="20" height="8" rx="1" fill="#2d5f2e"/>
+                                <!-- User plus icon -->
+                                <circle cx="25" cy="30" r="24" fill="#e8f5e9"/>
+                                <circle cx="25" cy="30" r="24" stroke="#2d5f2e" stroke-width="2"/>
+                                <circle cx="25" cy="23" r="7" fill="#2d5f2e"/>
+                                <path d="M12 42C12 35 17 31 25 31C33 31 38 35 38 42" stroke="#2d5f2e" stroke-width="2.5" stroke-linecap="round"/>
+                                <!-- Plus sign -->
+                                <circle cx="45" cy="20" r="10" fill="#4a8c4a"/>
+                                <path d="M45 15 L45 25 M40 20 L50 20" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
                             </svg>
                         </div>
                         <h2>Opret konto</h2>
@@ -354,10 +384,12 @@ async function handleLogin(event) {
         
         // Redirect baseret på userType
         if (result.userType === 'ADMIN') {
-            // Redirect til admin panel hvis det er en admin
-            window.location.href = 'admin.html';
+            // Vis admin panel hvis det er en admin
+            if (typeof renderAdminSection === 'function') {
+                renderAdminSection();
+            }
         } else {
-            // Redirect til shop for almindelige kunder
+            // Vis shop for almindelige kunder
             renderSection('shop');
         }
     } else {
@@ -404,6 +436,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Opdater navigation baseret på login status
     updateNavigation();
+    
+    // Tjek om brugeren er admin og vis admin panel
+    const userType = localStorage.getItem('userType');
+    const userName = localStorage.getItem('userName');
+    
+    // SIKKERHEDSCHECK: Kun vis admin panel hvis både userType ER ADMIN og brugeren er logget ind
+    if (userType === 'ADMIN' && userName) {
+        // Vis admin panel for admin brugere
+        if (typeof renderAdminSection === 'function') {
+            renderAdminSection();
+        } else {
+            console.warn('renderAdminSection not available, showing shop instead');
+            renderSection('shop');
+        }
+    } else {
+        // Vis shop for almindelige brugere eller ikke-indloggede
+        // Hvis nogen har manipuleret localStorage til at sige ADMIN uden at være logget ind, ryd det
+        if (userType === 'ADMIN' && !userName) {
+            console.warn('Invalid admin state detected, clearing localStorage');
+            localStorage.removeItem('userType');
+        }
+        renderSection('shop');
+    }
     
     // Add click handlers to nav links
     document.querySelectorAll('.nav-menu a').forEach(link => {
@@ -491,6 +546,22 @@ function updateNavigation() {
             </li>
             <li><a href="#" onclick="handleLogout(); return false;" style="color: #d32f2f;">Log ud</a></li>
         `;
+        
+        // Opdater navigation menu for admin
+        if (userType === 'ADMIN') {
+            const navMenu = document.querySelector('.nav-menu');
+            if (navMenu) {
+                navMenu.innerHTML = `
+                    <li><a href="#" onclick="if(typeof renderAdminSection === 'function') renderAdminSection(); return false;">Admin Panel</a></li>
+                `;
+            }
+            
+            // Opdater logo text
+            const logoText = document.querySelector('.logo-text');
+            if (logoText) {
+                logoText.textContent = 'BilligT-Shirt Admin';
+            }
+        }
     } else {
         // Bruger er ikke logget ind
         authMenu.innerHTML = `
@@ -520,10 +591,37 @@ function handleLogout() {
     localStorage.removeItem('userName');
     localStorage.removeItem('userType');
     
-    // Opdater navigation
+    // Nulstil navigation til standard shop navigation
+    const navMenu = document.querySelector('.nav-menu');
+    if (navMenu) {
+        navMenu.innerHTML = `
+            <li><a href="#" data-section="shop">Butik</a></li>
+            <li><a href="#" data-section="collections">Kollektioner</a></li>
+            <li><a href="#" data-section="about">Om Os</a></li>
+        `;
+        
+        // Genaktiver click handlers
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = e.target.dataset.section;
+                if (section) {
+                    renderSection(section);
+                }
+            });
+        });
+    }
+    
+    // Nulstil logo text
+    const logoText = document.querySelector('.logo-text');
+    if (logoText) {
+        logoText.textContent = 'BilligT-Shirt';
+    }
+    
+    // Opdater auth navigation
     updateNavigation();
     
-    // Redirect til shop
+    // Redirect til shop (tvungen)
     renderSection('shop');
     
     alert('Du er nu logget ud. På gensyn! 👋');

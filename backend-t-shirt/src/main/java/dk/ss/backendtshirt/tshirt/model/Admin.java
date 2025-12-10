@@ -9,7 +9,7 @@ public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "admin_id")
-    private int id;
+    private Long id;
 
     private String email;
     private String name;
@@ -20,18 +20,18 @@ public class Admin {
     public Admin() {
     }
 
-    public Admin(int id, String email, String name, String password) {
+    public Admin(Long id, String email, String name, String password) {
         this.id = id;
         this.email = email;
         this.name = name;
         this.password = password;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -13,7 +13,7 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(name = "order_number")
     private String orderNumber;
@@ -40,7 +40,7 @@ public class Order {
     public Order() {
     }
 
-    public Order(int id, String orderNumber,
+    public Order(Long id, String orderNumber,
                  BigDecimal totalAmount,
                  BigDecimal originalGiftThreshold,
                  LocalDateTime orderDate,
@@ -55,11 +55,11 @@ public class Order {
         this.orderGifts = orderGifts;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -1,7 +1,7 @@
 package dk.ss.backendtshirt.tshirt.dto;
 
 public class AuthResponseDTO {
-    private int id;
+    private Long id;
     private String email;
     private String name;
     private String userType; // "CUSTOMER" or "ADMIN"
@@ -11,7 +11,7 @@ public class AuthResponseDTO {
     public AuthResponseDTO() {
     }
 
-    public AuthResponseDTO(int id, String email, String name, String userType, String token, String message) {
+    public AuthResponseDTO(Long id, String email, String name, String userType, String token, String message) {
         this.id = id;
         this.email = email;
         this.name = name;
@@ -20,11 +20,11 @@ public class AuthResponseDTO {
         this.message = message;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

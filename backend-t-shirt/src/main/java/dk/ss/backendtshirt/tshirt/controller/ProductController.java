@@ -1,5 +1,7 @@
 package dk.ss.backendtshirt.tshirt.controller;
 
+import dk.ss.backendtshirt.tshirt.dto.ProductRequestDTO;
+import dk.ss.backendtshirt.tshirt.dto.ProductResponseDTO;
 import dk.ss.backendtshirt.tshirt.model.Product;
 import dk.ss.backendtshirt.tshirt.service.ProductService;
 import jakarta.validation.Valid;
@@ -9,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/products")
@@ -29,72 +32,47 @@ public class ProductController {
      * POST /api/products
      */
     @PostMapping
-    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
-        Product createdProduct = productService.createProduct(product);
-        return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
+    public ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO requestDTO) {
+        Product createdProduct = productService.createProductFromDTO(requestDTO);
+        return new ResponseEntity<>(new ProductResponseDTO(createdProduct), HttpStatus.CREATED);
     }
 
     /**
-     * Get all products including inactive (Admin)
-     * GET /api/products/admin/all
+     * Get ALL products including inactive (Admin)
+     * GET /api/products
+     * Returns active as INTEGER (1 or 0)
      */
-    @GetMapping("/admin/all")
-    public ResponseEntity<List<Product>> getAllProducts() {
+    @GetMapping
+    public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
         List<Product> products = productService.getAllProducts();
-        return ResponseEntity.ok(products);
+        List<ProductResponseDTO> responseDTOs = products.stream()
+                .map(ProductResponseDTO::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(responseDTOs);
     }
 
     /**
      * Get product by ID (Admin & Customer)
      * GET /api/products/{id}
+     * Returns active as INTEGER (1 or 0)
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        return productService.getProductById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ProductResponseDTO> getProductById(@PathVariable Long id) {
+        Product product = productService.getProductById(id);
+        return ResponseEntity.ok(new ProductResponseDTO(product));
     }
 
     /**
      * Update product (Admin)
      * PUT /api/products/{id}
+     * Accepts active as BOOLEAN (true/false), converts to integer in database
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody Product productDetails) {
-        try {
-            Product updatedProduct = productService.updateProduct(id, productDetails);
-            return ResponseEntity.ok(updatedProduct);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    /**
-     * Deactivate product (Admin) - Soft delete
-     * PATCH /api/products/{id}/deactivate
-     */
-    @PatchMapping("/{id}/deactivate")
-    public ResponseEntity<Product> deactivateProduct(@PathVariable Long id) {
-        try {
-            Product deactivatedProduct = productService.deactivateProduct(id);
-            return ResponseEntity.ok(deactivatedProduct);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    /**
-     * Activate product (Admin)
-     * PATCH /api/products/{id}/activate
-     */
-    @PatchMapping("/{id}/activate")
-    public ResponseEntity<Product> activateProduct(@PathVariable Long id) {
-        try {
-            Product activatedProduct = productService.activateProduct(id);
-            return ResponseEntity.ok(activatedProduct);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ProductResponseDTO> updateProduct(
+            @PathVariable Long id,
+            @Valid @RequestBody ProductRequestDTO requestDTO) {
+        Product updatedProduct = productService.updateProductFromDTO(id, requestDTO);
+        return ResponseEntity.ok(new ProductResponseDTO(updatedProduct));
     }
 
     /**
@@ -103,33 +81,21 @@ public class ProductController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        try {
-            productService.deleteProduct(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    // Customer endpoints - Only active products
-
-    /**
-     * Get all active products (Customer)
-     * GET /api/products
-     */
-    @GetMapping
-    public ResponseEntity<List<Product>> getActiveProducts() {
-        List<Product> activeProducts = productService.getActiveProducts();
-        return ResponseEntity.ok(activeProducts);
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
     }
 
     /**
-     * Get inactive products (Admin)
-     * GET /api/products/admin/inactive
+     * Get only active products (Customer)
+     * GET /api/products/active
+     * Returns active as INTEGER (1 or 0)
      */
-    @GetMapping("/admin/inactive")
-    public ResponseEntity<List<Product>> getInactiveProducts() {
-        List<Product> inactiveProducts = productService.getInactiveProducts();
-        return ResponseEntity.ok(inactiveProducts);
+    @GetMapping("/active")
+    public ResponseEntity<List<ProductResponseDTO>> getActiveProducts() {
+        List<Product> products = productService.getActiveProducts();
+        List<ProductResponseDTO> responseDTOs = products.stream()
+                .map(ProductResponseDTO::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(responseDTOs);
     }
 }

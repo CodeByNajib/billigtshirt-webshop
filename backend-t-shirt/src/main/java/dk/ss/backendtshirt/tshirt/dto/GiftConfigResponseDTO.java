@@ -1,32 +1,23 @@
-package dk.ss.backendtshirt.tshirt.model;
-
-import jakarta.persistence.*;
+package dk.ss.backendtshirt.tshirt.dto;
 
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = "GIFT_CONFIG")
-public class GiftConfig {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class GiftConfigResponseDTO {
     private Long id;
-
-    @Column(name = "threshold_amount")
     private BigDecimal thresholdAmount;
-
-    @Column(name = "gift_product_id")
     private Long giftProductId;
+    private String giftProductName;
+    private Integer active;
 
-    private int active; // 1 = active, 0 = inactive
-
-    public GiftConfig() {
+    public GiftConfigResponseDTO() {
     }
 
-    public GiftConfig(Long id, BigDecimal thresholdAmount, int active, Long giftProductId) {
+    public GiftConfigResponseDTO(Long id, BigDecimal thresholdAmount, Long giftProductId, String giftProductName, Integer active) {
         this.id = id;
         this.thresholdAmount = thresholdAmount;
-        this.active = active;
         this.giftProductId = giftProductId;
+        this.giftProductName = giftProductName;
+        this.active = active;
     }
 
     public Long getId() {
@@ -45,14 +36,6 @@ public class GiftConfig {
         this.thresholdAmount = thresholdAmount;
     }
 
-    public int getActive() {
-        return active;
-    }
-
-    public void setActive(int active) {
-        this.active = active;
-    }
-
     public Long getGiftProductId() {
         return giftProductId;
     }
@@ -60,4 +43,21 @@ public class GiftConfig {
     public void setGiftProductId(Long giftProductId) {
         this.giftProductId = giftProductId;
     }
+
+    public String getGiftProductName() {
+        return giftProductName;
+    }
+
+    public void setGiftProductName(String giftProductName) {
+        this.giftProductName = giftProductName;
+    }
+
+    public Integer getActive() {
+        return active;
+    }
+
+    public void setActive(Integer active) {
+        this.active = active;
+    }
 }
+
