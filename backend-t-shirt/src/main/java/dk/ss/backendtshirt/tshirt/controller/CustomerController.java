@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/customers") // Base URL for alle endpoints her
-@CrossOrigin //@CrossOrigin // Tillad kald fra frontend (Hvis vi kører på en anden port)
+@CrossOrigin(originPatterns = "*", allowCredentials = "true")
 public class CustomerController {
     private final CustomerService customerService;
 
