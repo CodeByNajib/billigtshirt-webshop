@@ -3,9 +3,12 @@ package dk.ss.backendtshirt.tshirt.service;
 import dk.ss.backendtshirt.common.exception.ResourceNotFoundException;
 import dk.ss.backendtshirt.tshirt.dto.CartDTO;
 import dk.ss.backendtshirt.tshirt.dto.CartItemDTO;
+import dk.ss.backendtshirt.tshirt.dto.FreeGiftDTO;
 import dk.ss.backendtshirt.tshirt.model.Cart;
+import dk.ss.backendtshirt.tshirt.model.GiftProduct;
 import dk.ss.backendtshirt.tshirt.model.Product;
 import dk.ss.backendtshirt.tshirt.repository.CartRepository;
+import dk.ss.backendtshirt.tshirt.repository.GiftProductRepository;
 import dk.ss.backendtshirt.tshirt.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,12 +26,15 @@ public class CartService {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
     private final GiftService giftService;
+    private final GiftProductRepository giftProductRepository;
 
     @Autowired
-    public CartService(CartRepository cartRepository, ProductRepository productRepository, GiftService giftService) {
+    public CartService(CartRepository cartRepository, ProductRepository productRepository,
+                      GiftService giftService, GiftProductRepository giftProductRepository) {
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
         this.giftService = giftService;
+        this.giftProductRepository = giftProductRepository;
     }
 
     // Hent eller opret kurv
@@ -119,6 +125,21 @@ public class CartService {
             cartDTO.setMissingForFreeGift(missing);
         }
 
+        // Tilføj gratis gave information hvis valgt
+        if (cart.getFreeGiftProductId() != null) {
+            GiftProduct giftProduct = giftProductRepository.findById(cart.getFreeGiftProductId())
+                    .orElse(null);
+
+            if (giftProduct != null) {
+                cartDTO.setHasFreeGift(true);
+                cartDTO.setFreeGift(new FreeGiftDTO(giftProduct.getName(), giftProduct.getId()));
+            } else {
+                cartDTO.setHasFreeGift(false);
+            }
+        } else {
+            cartDTO.setHasFreeGift(false);
+        }
+
         return cartDTO;
     }
 
@@ -158,7 +179,60 @@ public class CartService {
 
         List<CartItemDTO> dtoList = new ArrayList<>(itemMap.values());
 
-        // Returner basis objektet (uden gave-logik endnu - det sættes i metoden ovenover)
+        // Returner basis objektet (uden gave-logik endnu - det sættes i metoden ovenfor)
         return new CartDTO(dtoList, cart.getTotalAmount());
+    }
+
+    /**
+     * Vælg gratis gave til kurven (US-K2)
+     * Validerer at brugeren opfylder kravene og tilføjer gaven
+     */
+    public CartDTO selectFreeGift(Long cartId, Long giftProductId) {
+        // 1. Hent kurven
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new ResourceNotFoundException("Kurv ikke fundet"));
+
+        // 2. Tjek om beløbsgrænsen er nået
+        BigDecimal giftThreshold = giftService.getCurrentThreshold();
+        BigDecimal currentTotal = cart.getTotalAmount();
+
+        if (currentTotal.compareTo(giftThreshold) < 0) {
+            BigDecimal missing = giftThreshold.subtract(currentTotal);
+            throw new IllegalArgumentException("Du har ikke nået beløbsgrænsen for gratis gave. Mangler: " + missing + " kr");
+        }
+
+        // 3. Tjek om brugeren allerede har valgt en gave
+        if (cart.getFreeGiftProductId() != null) {
+            throw new IllegalArgumentException("Du har allerede valgt en gratis gave");
+        }
+
+        // 4. Validér at gave produktet eksisterer
+        GiftProduct giftProduct = giftProductRepository.findById(giftProductId)
+                .orElseThrow(() -> new ResourceNotFoundException("Gave produkt ikke fundet"));
+
+        // 5. Tjek om gaven er på lager
+        if (giftProduct.getStockQuantity() == null || giftProduct.getStockQuantity() <= 0) {
+            throw new IllegalArgumentException("Dette produkt er ikke på lager");
+        }
+
+        // 6. Tilføj gaven til kurven
+        cart.setFreeGiftProductId(giftProductId);
+        cartRepository.save(cart);
+
+        // 7. Returnér opdateret cart DTO
+        return getCartDetails(cartId);
+    }
+
+    /**
+     * Fjern valgt gratis gave fra kurven
+     */
+    public CartDTO removeFreeGift(Long cartId) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new ResourceNotFoundException("Kurv ikke fundet"));
+
+        cart.setFreeGiftProductId(null);
+        cartRepository.save(cart);
+
+        return getCartDetails(cartId);
     }
 }

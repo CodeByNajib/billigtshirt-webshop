@@ -1,5 +1,6 @@
 package dk.ss.backendtshirt.tshirt.controller;
 
+import dk.ss.backendtshirt.common.exception.ResourceNotFoundException;
 import dk.ss.backendtshirt.tshirt.dto.CartDTO;
 import dk.ss.backendtshirt.tshirt.model.Cart;
 import dk.ss.backendtshirt.tshirt.service.CartService;
@@ -9,9 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/cart")
+@CrossOrigin(originPatterns = "*", allowCredentials = "true")
 public class CartController {
 
     private final CartService cartService;
@@ -67,9 +70,113 @@ public class CartController {
         }
     }
 
+    // 3. VÆLG GRATIS GAVE (US-K2) - MED OMFATTENDE DEBUG
+    @PostMapping("/select-free-gift")
+    public ResponseEntity<?> selectFreeGift(@RequestBody Map<String, Object> request, HttpSession session) {
+        try {
+            System.out.println("=== SELECT FREE GIFT DEBUG START ===");
+            System.out.println("📦 Request body: " + request);
+
+            // Parse gift product ID
+            Long giftProductId = null;
+            Object giftIdObj = request.get("giftProductId");
+            System.out.println("🎁 Gift ID object type: " + (giftIdObj != null ? giftIdObj.getClass().getName() : "null"));
+            System.out.println("🎁 Gift ID value: " + giftIdObj);
+
+            if (giftIdObj instanceof Number) {
+                giftProductId = ((Number) giftIdObj).longValue();
+            } else if (giftIdObj instanceof String) {
+                giftProductId = Long.parseLong((String) giftIdObj);
+            }
+
+            System.out.println("🎁 Parsed Gift Product ID: " + giftProductId);
+
+            // Hent kurv ID fra session
+            Long cartId = (Long) session.getAttribute("cartId");
+            System.out.println("🛒 Cart ID from session: " + cartId);
+
+            if (cartId == null) {
+                System.err.println("❌ Cart ID is NULL - no cart in session");
+                return ResponseEntity.status(404).body(Map.of("message", "Kurv ikke fundet"));
+            }
+
+            if (giftProductId == null) {
+                System.err.println("❌ Gift Product ID is NULL");
+                return ResponseEntity.status(400).body(Map.of("message", "Gift produkt ID mangler"));
+            }
+
+            System.out.println("✅ Calling cartService.selectFreeGift(" + cartId + ", " + giftProductId + ")");
+
+            // Vælg gratis gave
+            CartDTO updatedCart = cartService.selectFreeGift(cartId, giftProductId);
+
+            System.out.println("✅ Successfully selected free gift!");
+            System.out.println("🎉 Updated cart - hasFreeGift: " + updatedCart.isHasFreeGift());
+            System.out.println("=== SELECT FREE GIFT DEBUG END ===");
+
+            return ResponseEntity.ok(updatedCart);
+
+        } catch (ResourceNotFoundException e) {
+            System.err.println("❌ ResourceNotFoundException: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            System.err.println("❌ IllegalArgumentException: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(400).body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            System.err.println("❌❌❌ UNEXPECTED ERROR ❌❌❌");
+            System.err.println("Exception type: " + e.getClass().getName());
+            System.err.println("Error message: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of(
+                "message", "Der skete en fejl: " + e.getMessage(),
+                "type", e.getClass().getSimpleName()
+            ));
+        }
+    }
+
+    // 4. FJERN GRATIS GAVE
+    @DeleteMapping("/remove-free-gift")
+    public ResponseEntity<?> removeFreeGift(HttpSession session) {
+        try {
+            System.out.println("=== REMOVE FREE GIFT DEBUG START ===");
+
+            Long cartId = (Long) session.getAttribute("cartId");
+            System.out.println("🛒 Cart ID from session: " + cartId);
+
+            if (cartId == null) {
+                System.err.println("❌ Cart ID is NULL");
+                return ResponseEntity.status(404).body(Map.of("message", "Kurv ikke fundet"));
+            }
+
+            CartDTO updatedCart = cartService.removeFreeGift(cartId);
+
+            System.out.println("✅ Successfully removed free gift!");
+            System.out.println("=== REMOVE FREE GIFT DEBUG END ===");
+
+            return ResponseEntity.ok(updatedCart);
+
+        } catch (ResourceNotFoundException e) {
+            System.err.println("❌ ResourceNotFoundException: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            System.err.println("❌❌❌ UNEXPECTED ERROR ❌❌❌");
+            System.err.println("Exception type: " + e.getClass().getName());
+            System.err.println("Error message: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of(
+                "message", "Der skete en fejl: " + e.getMessage(),
+                "type", e.getClass().getSimpleName()
+            ));
+        }
+    }
+
     // Lille hjælpe-klasse til at læse JSON fra frontend: { "productId": 1, "quantity": 1 }
     public static class AddToCartRequest {
         public Long productId;
         public int quantity;
     }
 }
+
