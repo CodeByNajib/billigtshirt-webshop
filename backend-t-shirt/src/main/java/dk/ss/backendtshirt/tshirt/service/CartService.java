@@ -30,7 +30,7 @@ public class CartService {
 
     @Autowired
     public CartService(CartRepository cartRepository, ProductRepository productRepository,
-                      GiftService giftService, GiftProductRepository giftProductRepository) {
+                       GiftService giftService, GiftProductRepository giftProductRepository) {
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
         this.giftService = giftService;
@@ -89,7 +89,6 @@ public class CartService {
         Cart cart = getCart(cartId);
         return giftService.checkQualification(cart.getTotalAmount());
     }
-
 
 
     // ==========================================
@@ -163,6 +162,7 @@ public class CartService {
             if (itemMap.containsKey(id)) {
                 CartItemDTO existing = itemMap.get(id);
                 CartItemDTO updated = new CartItemDTO(
+                        id,  // productId
                         existing.getProductName(),
                         existing.getQuantity() + 1,
                         existing.getPricePerUnit()
@@ -170,6 +170,7 @@ public class CartService {
                 itemMap.put(id, updated);
             } else {
                 itemMap.put(id, new CartItemDTO(
+                        id,  // productId
                         product.getName(),
                         1,
                         product.getPrice()
@@ -234,5 +235,74 @@ public class CartService {
         cartRepository.save(cart);
 
         return getCartDetails(cartId);
+    }
+
+    /**
+     * Opdater antal af et produkt i kurven
+     */
+    public CartDTO updateCartItemQuantity(Long cartId, Long productId, int newQuantity) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new ResourceNotFoundException("Kurv ikke fundet"));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Produkt ikke fundet"));
+
+        List<Product> items = cart.getItems();
+        int currentCount = 0;
+
+        for (Product item : items) {
+            if (item.getId().equals(productId)) {
+                currentCount++;
+            }
+        }
+
+        int difference = newQuantity - currentCount;
+
+        if (difference > 0) {
+            for (int i = 0; i < difference; i++) {
+                cart.addItem(product);
+            }
+        } else if (difference < 0) {
+            int toRemove = Math.abs(difference);
+            for (int i = 0; i < toRemove; i++) {
+                cart.removeItem(product);
+            }
+        }
+
+        checkAndUpdateGiftStatus(cart);
+        cartRepository.save(cart);
+        return getCartDetails(cartId);
+    }
+
+    /**
+     * Fjern et produkt helt fra kurven
+     */
+    public CartDTO removeCartItem(Long cartId, Long productId) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new ResourceNotFoundException("Kurv ikke fundet"));
+
+        cart.getItems().removeIf(item -> item.getId().equals(productId));
+        cart.recalculateTotal();
+
+        checkAndUpdateGiftStatus(cart);
+        cartRepository.save(cart);
+        return getCartDetails(cartId);
+    }
+
+    /**
+     * Hjælpemetode: Tjek og opdater gave-status
+     */
+    private void checkAndUpdateGiftStatus(Cart cart) {
+        BigDecimal giftThreshold = giftService.getCurrentThreshold();
+        BigDecimal currentTotal = cart.getTotalAmount();
+
+        if (cart.getItems().isEmpty()) {
+            cart.setFreeGiftProductId(null);
+            return;
+        }
+
+        if (currentTotal.compareTo(giftThreshold) < 0 && cart.getFreeGiftProductId() != null) {
+            cart.setFreeGiftProductId(null);
+        }
     }
 }

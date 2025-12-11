@@ -173,10 +173,111 @@ public class CartController {
         }
     }
 
+    // 5. OPDATER VAREANTAL (NY ENDPOINT)
+    @PutMapping("/update")
+    public ResponseEntity<?> updateCartItem(@RequestBody UpdateCartRequest request, HttpSession session) {
+        try {
+            System.out.println("=== UPDATE CART ITEM DEBUG START ===");
+            System.out.println("📦 Request: productId=" + request.productId + ", quantity=" + request.quantity);
+
+            Long cartId = (Long) session.getAttribute("cartId");
+            System.out.println("🛒 Cart ID from session: " + cartId);
+
+            if (cartId == null) {
+                System.err.println("❌ Cart ID is NULL");
+                return ResponseEntity.status(404).body(Map.of("message", "Kurv ikke fundet"));
+            }
+
+            if (request.productId == null) {
+                System.err.println("❌ Product ID is NULL");
+                return ResponseEntity.status(400).body(Map.of("message", "Product ID mangler"));
+            }
+
+            if (request.quantity < 0) {
+                System.err.println("❌ Invalid quantity: " + request.quantity);
+                return ResponseEntity.status(400).body(Map.of("message", "Antal skal være mindst 0"));
+            }
+
+            CartDTO updatedCart;
+
+            if (request.quantity == 0) {
+                // Hvis quantity er 0, fjern produktet helt
+                System.out.println("🗑️ Quantity is 0, removing product completely");
+                updatedCart = cartService.removeCartItem(cartId, request.productId);
+            } else {
+                // Ellers opdater antallet
+                System.out.println("✏️ Updating quantity to " + request.quantity);
+                updatedCart = cartService.updateCartItemQuantity(cartId, request.productId, request.quantity);
+            }
+
+            System.out.println("✅ Successfully updated cart!");
+            System.out.println("=== UPDATE CART ITEM DEBUG END ===");
+
+            return ResponseEntity.ok(updatedCart);
+
+        } catch (ResourceNotFoundException e) {
+            System.err.println("❌ ResourceNotFoundException: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            System.err.println("❌❌❌ UNEXPECTED ERROR ❌❌❌");
+            System.err.println("Exception type: " + e.getClass().getName());
+            System.err.println("Error message: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of(
+                "message", "Der skete en fejl: " + e.getMessage(),
+                "type", e.getClass().getSimpleName()
+            ));
+        }
+    }
+
+    // 6. FJERN VARE (NY ENDPOINT)
+    @DeleteMapping("/remove/{productId}")
+    public ResponseEntity<?> removeCartItem(@PathVariable Long productId, HttpSession session) {
+        try {
+            System.out.println("=== REMOVE CART ITEM DEBUG START ===");
+            System.out.println("🗑️ Removing productId: " + productId);
+
+            Long cartId = (Long) session.getAttribute("cartId");
+            System.out.println("🛒 Cart ID from session: " + cartId);
+
+            if (cartId == null) {
+                System.err.println("❌ Cart ID is NULL");
+                return ResponseEntity.status(404).body(Map.of("message", "Kurv ikke fundet"));
+            }
+
+            CartDTO updatedCart = cartService.removeCartItem(cartId, productId);
+
+            System.out.println("✅ Successfully removed item from cart!");
+            System.out.println("=== REMOVE CART ITEM DEBUG END ===");
+
+            return ResponseEntity.ok(updatedCart);
+
+        } catch (ResourceNotFoundException e) {
+            System.err.println("❌ ResourceNotFoundException: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            System.err.println("❌❌❌ UNEXPECTED ERROR ❌❌❌");
+            System.err.println("Exception type: " + e.getClass().getName());
+            System.err.println("Error message: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of(
+                "message", "Der skete en fejl: " + e.getMessage(),
+                "type", e.getClass().getSimpleName()
+            ));
+        }
+    }
+
     // Lille hjælpe-klasse til at læse JSON fra frontend: { "productId": 1, "quantity": 1 }
     public static class AddToCartRequest {
         public Long productId;
         public int quantity;
     }
-}
 
+    // Hjælpe-klasse til UPDATE endpoint: { "productId": 1, "quantity": 3 }
+    public static class UpdateCartRequest {
+        public Long productId;
+        public int quantity;
+    }
+}
