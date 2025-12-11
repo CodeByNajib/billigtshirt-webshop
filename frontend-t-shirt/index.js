@@ -533,8 +533,8 @@ function renderCartItems(cart, contentElement, footerElement) {
     document.getElementById('cart-total-price').textContent = cart.grandTotal;
     footerElement.style.display = 'block';
 
-    // We will use this in the next task (User Story 2 & 3)
-    // checkGiftStatus(cart); 
+    // --- NYT: Opdater statusboksen baseret på tallene ---
+    updateGiftStatus(cart);
 }
 
 
@@ -837,4 +837,28 @@ function renderOfflineCart(content, footer) {
         grandTotal: 300
     };
     renderCartItems(demoCart, content, footer);
+}
+
+// --- TASK 2.3 & 3.2: GAVE STATUS LOGIK ---
+function updateGiftStatus(cart) {
+    const statusDiv = document.getElementById('gift-status-message');
+    if (!statusDiv) return;
+
+    // Ryd gamle klasser
+    statusDiv.className = 'gift-status-box';
+
+    // Tjek om man kan vælge gave (Boolean fra Backend)
+    if (cart.canSelectFreeGift === true) {
+        // TASK 3.2: Vis Succes
+        statusDiv.textContent = "🎉 Tillykke! Du har optjent en gratis gave. Gå til 'Gaver' for at vælge.";
+        statusDiv.classList.add('gift-success');
+    } else {
+        // TASK 2.3: Vis hvor meget der mangler
+        // Vi bruger 'missingForFreeGift' fra backenden. 
+        // Hvis den er null/undefined sætter vi den til 0 for en sikkerheds skyld.
+        const missing = cart.missingForFreeGift || 0;
+        
+        statusDiv.textContent = `⚠️ Du mangler ${missing} kr. for at få en gratis gave.`;
+        statusDiv.classList.add('gift-warning');
+    }
 }

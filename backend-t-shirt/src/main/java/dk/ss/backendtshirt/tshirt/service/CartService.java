@@ -86,32 +86,56 @@ public class CartService {
 
 
 
-    // METHODS FOR TASK 1.1 & 1.2 (DTO Logic)
+    // ==========================================
+    // METHODS FOR TASK 1.1, 1.2, 2.1 & 2.2
+    // ==========================================
 
     /**
-     * This is the method the Controller should call.
-     * It fetches the Entity -> Converts to DTO -> Returns JSON-ready object.
+     * Metode som Controlleren kalder.
+     * 1. Henter data
+     * 2. Mapper til DTO
+     * 3. Beregner gave-regler (TASK 2.1 & 2.2)
      */
     public CartDTO getCartDetails(Long cartId) {
         Cart cart = getCart(cartId);
-        return mapToDTO(cart);
+        CartDTO cartDTO = mapToDTO(cart);
+
+        // --- TASK 2.1: Hent grænsen DYNAMISK ---
+        // Nu: Vi spørger GiftService (som spørger databasen)
+        //Calling your existing DB-connected method
+        BigDecimal giftThreshold = giftService.getCurrentThreshold();
+
+        // --- TASK 2.2 & 3.1: Logik ---
+        BigDecimal currentTotal = cart.getTotalAmount();
+
+        if (currentTotal.compareTo(giftThreshold) >= 0) {
+            // Kvalificeret
+            cartDTO.setCanSelectFreeGift(true);
+            cartDTO.setMissingForFreeGift(BigDecimal.ZERO);
+        } else {
+            // Ikke kvalificeret
+            cartDTO.setCanSelectFreeGift(false);
+            BigDecimal missing = giftThreshold.subtract(currentTotal);
+            cartDTO.setMissingForFreeGift(missing);
+        }
+
+        return cartDTO;
     }
 
     /**
-     * Helper method: Converts raw DB data into frontend-friendly data.
-     * Groups identical items (e.g. 2x T-Shirts).
+     * Hjælpemetode: Konverterer DB Entities til Frontend DTO.
+     * Grupperer ens varer (fx 2x T-Shirts).
      */
     public CartDTO mapToDTO(Cart cart) {
         Map<Long, CartItemDTO> itemMap = new HashMap<>();
 
-        // --- FIX START: Safety Check ---
+        // Null-Safety check (som vi lavede i Fase 1)
         List<Product> products = cart.getItems();
         if (products == null) {
-            products = new ArrayList<>(); // Use an empty list instead of null
+            products = new ArrayList<>();
         }
-        // --- FIX END ---
 
-        // 1. Group items logic
+        // Grupperings-logik
         for (Product product : products) {
             Long id = product.getId();
 
@@ -132,12 +156,9 @@ public class CartService {
             }
         }
 
-        // 2. Convert to List
         List<CartItemDTO> dtoList = new ArrayList<>(itemMap.values());
 
-        // 3. Return DTO
+        // Returner basis objektet (uden gave-logik endnu - det sættes i metoden ovenover)
         return new CartDTO(dtoList, cart.getTotalAmount());
     }
-
-
 }

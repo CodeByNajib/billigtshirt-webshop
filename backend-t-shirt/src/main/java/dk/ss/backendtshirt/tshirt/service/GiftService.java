@@ -221,4 +221,15 @@ public class GiftService {
         BigDecimal threshold = getCurrentThreshold();
         return amount.compareTo(threshold) >= 0;
     }
+
+//    /* NÅR DATABASEN ER OPRETTET, SKAL DENNE */
+//    public BigDecimal getGiftThreshold() {
+//        // Her bør du kalde dit repository.
+//        // F.eks: return giftConfigRepository.findFirstByActiveTrue().getThresholdAmount();
+//
+//        // MIDLERTIDIGT: Hvis I ikke har fået lagt data i gift_config tabellen endnu,
+//        // så simulerer vi et DB-kald her.
+//        // Når I har data i tabellen, udskifter du linjen herunder med repository-kaldet.
+//        return new BigDecimal("400.00");
+//    }
 }
