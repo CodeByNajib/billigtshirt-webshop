@@ -459,27 +459,22 @@ async function loadCart() {
     const content = document.getElementById('cart-content');
     const footer = document.getElementById('cart-footer');
     
-    // Safety check: if we aren't on the cart page, stop
     if (!content) return;
 
     try {
-        // Fetch from your Spring Boot Endpoint
-        // Note: Ensure your Backend is running on port 8080
-        const response = await fetch('http://localhost:8080/api/cart'); 
+        // HER ER RETTELSEN: Vi tilføjer options-objektet med credentials
+        const response = await fetch('http://localhost:8080/api/cart', {
+            credentials: 'include'  // <--- VIGTIGT! Husk mig!
+        }); 
         
         if (!response.ok) throw new Error('Kunne ikke hente kurv');
         
         const cartData = await response.json();
-        
-        // TASK 1.4: Render the data
         renderCartItems(cartData, content, footer);
         
     } catch (error) {
         console.error("Cart error:", error);
-        content.innerHTML = `<p style="text-align:center; color:red;">Der skete en fejl: ${error.message}</p>`;
-        
-        // Optional: Show offline fallback for testing
-        renderOfflineCart(content, footer);
+        content.innerHTML = `<p style="text-align:center; color:red;">Fejl: ${error.message}</p>`;
     }
 }
 
