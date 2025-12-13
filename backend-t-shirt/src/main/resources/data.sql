@@ -86,6 +86,18 @@ INSERT INTO gift_config (id, threshold_amount, active, gift_product_id, created_
 
 
 -- ============================================
+-- 4. ADMIN TABLE - ADMINISTRATOR BRUGERE
+-- ============================================
+
+-- Admin bruger (email: admin@tshirt.dk, password: admin123)
+INSERT INTO ADMIN (admin_id, email, name, password, created_at, updated_at) VALUES
+(1, 'admin@tshirt.dk', 'Administrator', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', NOW(), NOW()),
+
+-- Test Admin (email: test@tshirt.dk, password: test123)
+(2, 'test@tshirt.dk', 'Test Administrator', '$2a$10$EblZqNptyYvcLm9VfqH.8uKEyTkKkOEhGj8FsZqnp89xqBEV/7Qe.', NOW(), NOW());
+
+
+-- ============================================
 -- SUMMARY
 -- ============================================
 -- Products created: 17 (15 active, 2 inactive)
@@ -94,4 +106,3 @@ INSERT INTO gift_config (id, threshold_amount, active, gift_product_id, created_
 -- Total gift stock: 1950 units
 -- Price range: 79-169 kr
 -- ============================================
-
