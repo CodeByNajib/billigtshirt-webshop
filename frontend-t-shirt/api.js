@@ -45,12 +45,68 @@ const api = {
 
     async getCart() {
         try {
-            const response = await fetch(`${API_BASE_URL}/cart`);
+            const response = await fetch(`${API_BASE_URL}/cart`, {
+                credentials: 'include'  // VIGTIGT: Send session cookie!
+            });
             if (!response.ok) throw new Error('Kunne ikke hente kurv');
             return await response.json();
         } catch (error) {
             console.error('Fejl ved hentning af kurv:', error);
-            return [];
+            return { items: [], grandTotal: 0 };  // Return korrekt struktur
+        }
+    },
+
+    async updateCartItemQuantity(productId, quantity) {
+        try {
+            console.log('Opdaterer kurv:', { productId, quantity });
+            const response = await fetch(`${API_BASE_URL}/cart/update`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ productId, quantity })
+            });
+            
+            console.log('Update response status:', response.status);
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                console.error('Backend fejl ved opdatering:', errorData);
+                throw new Error(errorData?.message || `HTTP ${response.status}`);
+            }
+            
+            const result = await response.json();
+            console.log('Kurv opdateret succesfuldt:', result);
+            return result;
+        } catch (error) {
+            console.error('Fejl ved opdatering af kurv:', error);
+            return null;
+        }
+    },
+
+    async removeCartItem(productId) {
+        try {
+            console.log('Fjerner produkt:', productId);
+            const response = await fetch(`${API_BASE_URL}/cart/remove/${productId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+            
+            console.log('Remove response status:', response.status);
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                console.error('Backend fejl ved fjernelse:', errorData);
+                throw new Error(errorData?.message || `HTTP ${response.status}`);
+            }
+            
+            const result = await response.json();
+            console.log('Produkt fjernet succesfuldt:', result);
+            return result;
+        } catch (error) {
+            console.error('Fejl ved fjernelse af produkt:', error);
+            return null;
         }
     },
 
@@ -140,6 +196,90 @@ const api = {
         } catch (error) {
             console.error('Fejl ved hentning af ordrer:', error);
             return [];
+        }
+    },
+
+    // Place order with gift validation
+    async placeOrder(orderData) {
+        try {
+            console.log('Placerer ordre:', orderData);
+            const response = await fetch(`${API_BASE_URL}/orders/checkout`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(orderData)
+            });
+            
+            console.log('Checkout response status:', response.status);
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                console.error('Backend fejl ved checkout:', errorData);
+                
+                // Helpful error message for development
+                if (response.status === 500) {
+                    throw new Error('Backend endpoint ikke implementeret endnu. Se BACKEND_CHECKOUT_PROMPT.md for implementationsdetaljer.');
+                }
+                
+                throw new Error(errorData?.message || `HTTP ${response.status}`);
+            }
+            
+            const result = await response.json();
+            console.log('Ordre oprettet:', result);
+            return result;
+            
+        } catch (error) {
+            console.error('Fejl ved ordre oprettelse:', error);
+            throw error;
+        }
+    },
+
+    // TASK 2.1: Get available gift products
+    async getGiftProducts() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/gift-products`);
+            if (!response.ok) throw new Error('Kunne ikke hente gaveprodukter');
+            return await response.json();
+        } catch (error) {
+            console.error('Fejl ved hentning af gaveprodukter:', error);
+            return [];
+        }
+    },
+
+    // TASK 2.3: Select a free gift
+    async selectFreeGift(giftProductId) {
+        try {
+            console.log('Sender gave valg til backend:', giftProductId);
+            const response = await fetch(`${API_BASE_URL}/cart/select-free-gift`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ giftProductId })
+            });
+            
+            console.log('Response status:', response.status);
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                const errorMsg = errorData?.message || `HTTP ${response.status}: ${response.statusText}`;
+                console.error('Backend fejl:', errorData);
+                throw new Error(errorMsg);
+            }
+            
+            const result = await response.json();
+            console.log('Gave valgt succesfuldt:', result);
+            return result;
+        } catch (error) {
+            console.error('Fejl ved valg af gave - Details:', {
+                message: error.message,
+                stack: error.stack,
+                error: error
+            });
+            throw error;
         }
     }
 };

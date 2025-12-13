@@ -179,8 +179,138 @@ const sections = {
                 
                 <div id="gift-status-message" style="margin: 15px 0; padding: 10px; border-radius: 5px;"></div>
 
-                <button class="btn-primary" onclick="alert('Gå til kassen logic her')">Gå til kassen →</button>
+                <button class="btn-primary" onclick="renderSection('checkout')">Gå til kassen →</button>
             </div>
+        </div>
+    </section>
+`,
+
+  checkout: () => `
+    <section class="checkout-section" style="padding: 3rem 2rem;">
+        <div class="checkout-container" style="max-width: 1000px; margin: 0 auto;">
+            <button onclick="renderSection('cart')" class="back-button" style="margin-bottom: 2rem; padding: 0.5rem 1rem; background: #f0f0f0; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                ← Tilbage til kurv
+            </button>
+            
+            <h1 style="text-align: center; color: #2d4a2d; margin-bottom: 2rem;">Checkout</h1>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;">
+                <!-- Leverings information -->
+                <div class="checkout-form">
+                    <h2 style="color: #2d4a2d; margin-bottom: 1.5rem;">Leveringsinformation</h2>
+                    <form id="checkout-form" onsubmit="handleCheckout(event)">
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; color: #5a6a5a; font-weight: 500;">Navn</label>
+                            <input type="text" name="name" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;" placeholder="Dit fulde navn">
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; color: #5a6a5a; font-weight: 500;">Email</label>
+                            <input type="email" name="email" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;" placeholder="din@email.dk">
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; color: #5a6a5a; font-weight: 500;">Telefon</label>
+                            <input type="tel" name="phone" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;" placeholder="12345678">
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; color: #5a6a5a; font-weight: 500;">Adresse</label>
+                            <input type="text" name="address" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;" placeholder="Gadenavn 123">
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div class="form-group">
+                                <label style="display: block; margin-bottom: 0.5rem; color: #5a6a5a; font-weight: 500;">Postnr.</label>
+                                <input type="text" name="zipCode" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;" placeholder="1234">
+                            </div>
+                            <div class="form-group">
+                                <label style="display: block; margin-bottom: 0.5rem; color: #5a6a5a; font-weight: 500;">By</label>
+                                <input type="text" name="city" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;" placeholder="København">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; color: #5a6a5a; font-weight: 500;">Bemærkninger (valgfrit)</label>
+                            <textarea name="notes" rows="3" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;" placeholder="Eventuelle leveringsinstruktioner..."></textarea>
+                        </div>
+                        
+                        <!-- TASK 1.2 & 3.2: Gift validation messages -->
+                        <div id="checkout-gift-messages" style="margin-bottom: 1.5rem;"></div>
+                        
+                        <button type="submit" class="btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem; font-weight: bold;">
+                            Gennemfør bestilling
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Ordre oversigt -->
+                <div class="order-summary" style="background: #f5f9f5; padding: 2rem; border-radius: 12px; height: fit-content;">
+                    <h2 style="color: #2d4a2d; margin-bottom: 1.5rem;">Ordre oversigt</h2>
+                    <div id="checkout-summary">
+                        <p style="text-align: center; color: #5a6a5a;">Henter ordre detaljer...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+`,
+
+  orderConfirmation: (order) => `
+    <section class="order-confirmation" style="padding: 3rem 2rem;">
+        <div class="confirmation-container" style="max-width: 800px; margin: 0 auto; text-align: center;">
+            <div style="background: #e8f5e9; padding: 3rem; border-radius: 16px; margin-bottom: 2rem;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
+                <h1 style="color: #2d5f2e; margin-bottom: 1rem;">Tak for din bestilling!</h1>
+                <p style="color: #5a6a5a; font-size: 1.1rem;">Din ordre er bekræftet og behandles nu.</p>
+            </div>
+            
+            <div style="background: white; padding: 2rem; border-radius: 12px; text-align: left; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h2 style="color: #2d4a2d; margin-bottom: 1rem;">Ordre detaljer</h2>
+                <div style="border-bottom: 1px solid #eee; padding: 0.75rem 0;">
+                    <strong>Ordre nummer:</strong> #${order.orderId}
+                </div>
+                <div style="border-bottom: 1px solid #eee; padding: 0.75rem 0;">
+                    <strong>Navn:</strong> ${order.customerName}
+                </div>
+                <div style="border-bottom: 1px solid #eee; padding: 0.75rem 0;">
+                    <strong>Email:</strong> ${order.customerEmail}
+                </div>
+                <div style="border-bottom: 1px solid #eee; padding: 0.75rem 0;">
+                    <strong>Leveringsadresse:</strong> ${order.deliveryAddress}
+                </div>
+                
+                <h3 style="color: #2d4a2d; margin-top: 1.5rem; margin-bottom: 1rem;">Produkter</h3>
+                ${order.items.map(item => `
+                    <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0;">
+                        <span>${item.productName} × ${item.quantity}</span>
+                        <span style="font-weight: bold;">${item.rowTotal} kr.</span>
+                    </div>
+                `).join('')}
+                
+                <!-- TASK 2.3: Show gift on confirmation -->
+                ${order.freeGift ? `
+                    <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; background: #e8f5e9; margin-top: 0.5rem; padding: 1rem; border-radius: 8px;">
+                        <span style="color: #2d5f2e; font-weight: bold;">🎁 Gratis gave: ${order.freeGift.productName}</span>
+                        <span style="color: #2d5f2e; font-weight: bold;">GRATIS</span>
+                    </div>
+                ` : ''}
+                
+                <div style="display: flex; justify-content: space-between; padding: 1rem 0; margin-top: 1rem; border-top: 2px solid #2d5f2e; font-size: 1.2rem; font-weight: bold; color: #2d5f2e;">
+                    <span>Total:</span>
+                    <span>${order.totalAmount} kr.</span>
+                </div>
+            </div>
+            
+            <div style="background: #fff3cd; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #ffc107; margin-bottom: 2rem; text-align: left;">
+                <p style="margin: 0; color: #856404;">
+                    📧 En ordrebekræftelse er sendt til <strong>${order.customerEmail}</strong>
+                </p>
+            </div>
+            
+            <button onclick="renderSection('shop')" class="btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                Fortsæt med at handle
+            </button>
         </div>
     </section>
 `,
@@ -207,7 +337,7 @@ const sections = {
                 ${products
                   .map(
                     (product) => `
-                    <div class="product-card">
+                    <div class="product-card" onclick="viewProductDetail(${product.id})" style="cursor: pointer;">
                         <div class="product-image">${getProductImage(
                           product
                         )}</div>
@@ -218,15 +348,71 @@ const sections = {
                                 <span class="price">${formatPrice(
                                   product.price
                                 )}</span>
-                                <button class="add-to-cart" onclick="addToCart(${
-                                  product.id
-                                })">Tilføj til kurv</button>
                             </div>
                         </div>
                     </div>
                 `
                   )
                   .join("")}
+            </div>
+        </section>
+    `,
+
+  productDetail: (product) => `
+        <section class="product-detail" style="padding: 3rem 2rem;">
+            <div class="product-detail-container" style="max-width: 1200px; margin: 0 auto;">
+                <button onclick="renderSection('collections')" class="back-button" style="margin-bottom: 2rem; padding: 0.5rem 1rem; background: #f0f0f0; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                    ← Tilbage til kollektioner
+                </button>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start;">
+                    <div class="product-detail-image" style="background: linear-gradient(135deg, #e8f5e9 0%, #d4e4d4 100%); border-radius: 16px; padding: 2rem; display: flex; align-items: center; justify-content: center; min-height: 500px;">
+                        ${getProductImage(product)}
+                    </div>
+                    
+                    <div class="product-detail-info">
+                        <h1 style="font-size: 2.5rem; color: #2d4a2d; margin-bottom: 1rem;">${product.name}</h1>
+                        <p style="font-size: 1.2rem; color: #5a6a5a; margin-bottom: 2rem; line-height: 1.6;">${product.description}</p>
+                        
+                        <div style="background: #f5f9f5; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <span style="font-size: 1.1rem; color: #5a6a5a;">Pris:</span>
+                                <span style="font-size: 2.5rem; color: #2d5f2e; font-weight: bold;">${formatPrice(product.price)}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #2d4a2d; margin-bottom: 1rem;">Produkt detaljer</h3>
+                            <ul style="list-style: none; padding: 0;">
+                                <li style="padding: 0.5rem 0; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between;">
+                                    <span style="color: #5a6a5a;">Materiale:</span>
+                                    <span style="font-weight: 500;">100% økologisk bomuld</span>
+                                </li>
+                                <li style="padding: 0.5rem 0; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between;">
+                                    <span style="color: #5a6a5a;">Pasform:</span>
+                                    <span style="font-weight: 500;">Regular fit</span>
+                                </li>
+                                <li style="padding: 0.5rem 0; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between;">
+                                    <span style="color: #5a6a5a;">Pleje:</span>
+                                    <span style="font-weight: 500;">Maskinvask 30°</span>
+                                </li>
+                                <li style="padding: 0.5rem 0; display: flex; justify-content: space-between;">
+                                    <span style="color: #5a6a5a;">Produkt ID:</span>
+                                    <span style="font-weight: 500;">#${product.id}</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <button onclick="addToCartFromDetail(${product.id})" class="add-to-cart-large" style="width: 100%; padding: 1.2rem 2rem; background: linear-gradient(135deg, #2d5f2e 0%, #4a8c4a 100%); color: white; border: none; border-radius: 12px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 12px rgba(45, 95, 46, 0.3);">
+                            🛒 Tilføj til kurv
+                        </button>
+                        
+                        <div style="margin-top: 2rem; padding: 1rem; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #2d5f2e;">
+                            <p style="margin: 0; color: #2d5f2e; font-weight: 500;">✓ Gratis fragt over 299 kr.</p>
+                            <p style="margin: 0.5rem 0 0 0; color: #2d5f2e; font-weight: 500;">✓ 30 dages returret</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     `,
@@ -417,6 +603,10 @@ function renderSection(sectionName) {
   if (sectionName === "cart") {
     loadCart(); // Triggers the function we just added
   }
+  
+  if (sectionName === "checkout") {
+    loadCheckoutSummary();
+  }
 
   // Update active nav link
   document.querySelectorAll(".nav-menu a").forEach((link) => {
@@ -435,6 +625,25 @@ function getCurrentSection() {
   return "shop";
 }
 
+// View product detail page
+function viewProductDetail(productId) {
+  const product = products.find((p) => p.id === productId);
+  if (!product) {
+    alert('Produkt ikke fundet');
+    return;
+  }
+  
+  const content = document.getElementById("app-content");
+  content.innerHTML = sections.productDetail(product);
+}
+
+// Add to cart from detail page
+async function addToCartFromDetail(productId) {
+  await addToCart(productId);
+  // Update cart counter after adding
+  updateCartCounter();
+}
+
 // Add to cart function - nu med backend integration
 async function addToCart(productId) {
   const product = products.find((p) => p.id === productId);
@@ -444,6 +653,8 @@ async function addToCart(productId) {
 
   if (result) {
     alert(`${product.name} tilføjet til kurven! 🛒`);
+    // Update cart counter
+    updateCartCounter();
   } else {
     // Fallback hvis backend ikke virker
     alert(`${product.name} tilføjet til kurven! 🛒 (Offline mode)`);
@@ -472,6 +683,15 @@ async function loadCart() {
         const cartData = await response.json();
         renderCartItems(cartData, content, footer);
         
+        // TASK 1.2: Auto-trigger popup when threshold is reached
+        // Check if user can select a gift and hasn't selected one yet
+        if (cartData.canSelectFreeGift === true && !cartData.hasFreeGift) {
+            // Small delay to ensure cart is rendered first
+            setTimeout(() => {
+                showGiftSelectionModal();
+            }, 500);
+        }
+        
     } catch (error) {
         console.error("Cart error:", error);
         content.innerHTML = `<p style="text-align:center; color:red;">Fejl: ${error.message}</p>`;
@@ -496,6 +716,7 @@ function renderCartItems(cart, contentElement, footerElement) {
                     <th style="padding: 10px;">Antal</th>
                     <th style="padding: 10px;">Pris</th>
                     <th style="padding: 10px;">I alt</th>
+                    <th style="padding: 10px; text-align: center;">Handling</th>
                 </tr>
             </thead>
             <tbody>
@@ -503,13 +724,33 @@ function renderCartItems(cart, contentElement, footerElement) {
 
     // 3. Loop through the "items" list from your Java DTO
     cart.items.forEach(item => {
+        // Use either item.productId or item.id depending on backend DTO
+        const itemId = item.productId || item.id;
+        
         html += `
             <tr style="border-bottom: 1px solid #eee;">
                 <td style="padding: 15px 10px;">
                     <strong>${item.productName}</strong>
                 </td>
                 <td style="padding: 15px 10px;">
-                    ${item.quantity} stk.
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button onclick="decreaseQuantity(${itemId}, ${item.quantity})" 
+                                class="quantity-btn" 
+                                style="width: 30px; height: 30px; border: 1px solid #ddd; background: white; border-radius: 5px; cursor: pointer; font-weight: bold; color: #2d5f2e;">
+                            −
+                        </button>
+                        <input type="number" 
+                               value="${item.quantity}" 
+                               min="0" 
+                               max="99"
+                               onchange="updateQuantity(${itemId}, this.value)"
+                               style="width: 60px; text-align: center; padding: 5px; border: 1px solid #ddd; border-radius: 5px; font-weight: bold;">
+                        <button onclick="increaseQuantity(${itemId}, ${item.quantity})" 
+                                class="quantity-btn"
+                                style="width: 30px; height: 30px; border: 1px solid #ddd; background: white; border-radius: 5px; cursor: pointer; font-weight: bold; color: #2d5f2e;">
+                            +
+                        </button>
+                    </div>
                 </td>
                 <td style="padding: 15px 10px;">
                     ${item.pricePerUnit} kr.
@@ -517,9 +758,37 @@ function renderCartItems(cart, contentElement, footerElement) {
                 <td style="padding: 15px 10px; font-weight: bold;">
                     ${item.rowTotal} kr.
                 </td>
+                <td style="padding: 15px 10px; text-align: center;">
+                    <button onclick="removeFromCart(${itemId}, '${item.productName}')" 
+                            class="remove-btn"
+                            style="background: #d32f2f; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-weight: 500; transition: all 0.3s;">
+                        🗑️ Fjern
+                    </button>
+                </td>
             </tr>
         `;
     });
+
+    // TASK 3.2: Add free gift row if present
+    if (cart.freeGift) {
+        html += `
+            <tr style="border-bottom: 1px solid #eee; background-color: #e8f5e9;">
+                <td style="padding: 15px 10px;">
+                    <strong>🎁 ${cart.freeGift.productName}</strong>
+                    <span style="display: block; color: #2d5f2e; font-size: 0.9rem; font-weight: bold;">Gratis gave</span>
+                </td>
+                <td style="padding: 15px 10px;">
+                    1 stk.
+                </td>
+                <td style="padding: 15px 10px; color: #2d5f2e;">
+                    GRATIS
+                </td>
+                <td style="padding: 15px 10px; font-weight: bold; color: #2d5f2e;">
+                    0 kr.
+                </td>
+            </tr>
+        `;
+    }
 
     html += '</tbody></table>';
     contentElement.innerHTML = html;
@@ -530,6 +799,334 @@ function renderCartItems(cart, contentElement, footerElement) {
 
     // --- NYT: Opdater statusboksen baseret på tallene ---
     updateGiftStatus(cart);
+}
+
+// ==========================================
+// CART COUNTER FUNCTIONALITY
+// ==========================================
+
+// Update cart counter badge
+async function updateCartCounter() {
+    try {
+        const response = await fetch('http://localhost:8080/api/cart', {
+            credentials: 'include'
+        });
+        
+        if (!response.ok) {
+            console.log('Kunne ikke hente kurv for counter');
+            return;
+        }
+        
+        const cartData = await response.json();
+        const counterElement = document.getElementById('cart-counter');
+        
+        if (!counterElement) return;
+        
+        // Calculate total number of items in cart
+        let totalItems = 0;
+        if (cartData.items && cartData.items.length > 0) {
+            totalItems = cartData.items.reduce((sum, item) => sum + item.quantity, 0);
+        }
+        
+        // Update counter display
+        if (totalItems > 0) {
+            counterElement.textContent = totalItems;
+            counterElement.style.display = 'flex';
+            
+            // Add bounce animation
+            counterElement.classList.remove('updated');
+            void counterElement.offsetWidth; // Trigger reflow
+            counterElement.classList.add('updated');
+        } else {
+            counterElement.style.display = 'none';
+        }
+        
+    } catch (error) {
+        console.error('Fejl ved opdatering af cart counter:', error);
+    }
+}
+
+// ==========================================
+// CART ITEM MANAGEMENT
+// ==========================================
+
+// Increase quantity
+async function increaseQuantity(productId, currentQuantity) {
+    const newQuantity = currentQuantity + 1;
+    await updateQuantity(productId, newQuantity);
+}
+
+// Decrease quantity
+async function decreaseQuantity(productId, currentQuantity) {
+    const newQuantity = currentQuantity - 1;
+    
+    if (newQuantity === 0) {
+        // Ask for confirmation when going to 0
+        const productName = getProductNameFromCart(productId);
+        if (confirm(`Er du sikker på at du vil fjerne "${productName}" fra kurven?`)) {
+            await updateQuantity(productId, 0);
+        }
+    } else {
+        await updateQuantity(productId, newQuantity);
+    }
+}
+
+// Update quantity (main function)
+async function updateQuantity(productId, newQuantity) {
+    const quantity = parseInt(newQuantity);
+    
+    // Validate quantity
+    if (isNaN(quantity) || quantity < 0) {
+        alert('Ugyldig antal. Venligst indtast et positivt tal.');
+        await loadCart(); // Reload to reset
+        return;
+    }
+    
+    // If quantity is 0, confirm removal
+    if (quantity === 0) {
+        const productName = getProductNameFromCart(productId);
+        if (!confirm(`Er du sikker på at du vil fjerne "${productName}" fra kurven?`)) {
+            await loadCart(); // Reload to reset
+            return;
+        }
+    }
+    
+    try {
+        // Call API to update quantity
+        const result = await api.updateCartItemQuantity(productId, quantity);
+        
+        if (result) {
+            // Reload cart to show updated data
+            await loadCart();
+            // Update counter
+            updateCartCounter();
+            
+            if (quantity === 0) {
+                console.log('Produkt fjernet fra kurven');
+            } else {
+                console.log(`Antal opdateret til ${quantity}`);
+            }
+        } else {
+            alert('Kunne ikke opdatere kurven. Prøv igen.');
+            await loadCart(); // Reload to reset
+        }
+    } catch (error) {
+        console.error('Fejl ved opdatering af antal:', error);
+        alert('Der opstod en fejl. Prøv igen.');
+        await loadCart(); // Reload to reset
+    }
+}
+
+// Remove item from cart with confirmation
+async function removeFromCart(productId, productName) {
+    // Double confirmation
+    if (!confirm(`Er du sikker på at du vil fjerne "${productName}" fra kurven?`)) {
+        return;
+    }
+    
+    try {
+        const result = await api.removeCartItem(productId);
+        
+        if (result) {
+            // Reload cart
+            await loadCart();
+            // Update counter
+            updateCartCounter();
+            
+            console.log(`${productName} fjernet fra kurven`);
+        } else {
+            alert('Kunne ikke fjerne produktet. Prøv igen.');
+        }
+    } catch (error) {
+        console.error('Fejl ved fjernelse af produkt:', error);
+        alert('Der opstod en fejl. Prøv igen.');
+    }
+}
+
+// Helper function to get product name from current cart display
+function getProductNameFromCart(productId) {
+    // Try to find the product name in the current cart display
+    const rows = document.querySelectorAll('.cart-container table tbody tr');
+    for (let row of rows) {
+        const removeBtn = row.querySelector(`button[onclick*="${productId}"]`);
+        if (removeBtn) {
+            const productNameElement = row.querySelector('strong');
+            if (productNameElement) {
+                return productNameElement.textContent;
+            }
+        }
+    }
+    return 'dette produkt';
+}
+
+// ==========================================
+// CHECKOUT FUNCTIONALITY
+// ==========================================
+
+// Load checkout summary
+async function loadCheckoutSummary() {
+    const summaryElement = document.getElementById('checkout-summary');
+    const messagesElement = document.getElementById('checkout-gift-messages');
+    
+    if (!summaryElement) return;
+    
+    try {
+        const response = await fetch('http://localhost:8080/api/cart', {
+            credentials: 'include'
+        });
+        
+        if (!response.ok) {
+            summaryElement.innerHTML = '<p style="color: red;">Kunne ikke hente kurv. Prøv igen.</p>';
+            return;
+        }
+        
+        const cart = await response.json();
+        
+        if (!cart.items || cart.items.length === 0) {
+            summaryElement.innerHTML = '<p>Din kurv er tom.</p>';
+            return;
+        }
+        
+        // Build summary HTML
+        let html = '<div style="margin-bottom: 1rem;">';
+        
+        cart.items.forEach(item => {
+            html += `
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #ddd;">
+                    <div>
+                        <strong>${item.productName}</strong>
+                        <div style="color: #5a6a5a; font-size: 0.9rem;">${item.quantity} × ${item.pricePerUnit} kr.</div>
+                    </div>
+                    <strong>${item.rowTotal} kr.</strong>
+                </div>
+            `;
+        });
+        
+        // Show free gift if present
+        if (cart.freeGift) {
+            html += `
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: #e8f5e9; border-radius: 8px; margin-top: 0.5rem;">
+                    <div>
+                        <strong style="color: #2d5f2e;">🎁 ${cart.freeGift.productName}</strong>
+                        <div style="color: #2d5f2e; font-size: 0.9rem;">Gratis gave</div>
+                    </div>
+                    <strong style="color: #2d5f2e;">GRATIS</strong>
+                </div>
+            `;
+        }
+        
+        html += `
+            <div style="display: flex; justify-content: space-between; padding: 1rem 0; margin-top: 1rem; border-top: 2px solid #2d5f2e; font-size: 1.3rem; font-weight: bold; color: #2d5f2e;">
+                <span>Total:</span>
+                <span>${cart.grandTotal} kr.</span>
+            </div>
+        </div>`;
+        
+        // Add shipping info
+        html += `
+            <div style="background: #e8f5e9; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                <p style="margin: 0; color: #2d5f2e; font-weight: 500;">✓ ${cart.grandTotal >= 299 ? 'Gratis fragt!' : 'Fragt: 49 kr.'}</p>
+                <p style="margin: 0.5rem 0 0 0; color: #2d5f2e; font-weight: 500;">✓ Forventet levering: 2-4 hverdage</p>
+            </div>
+        `;
+        
+        summaryElement.innerHTML = html;
+        
+        // TASK 1.2: Show gift warning if applicable
+        if (cart.canSelectFreeGift && !cart.freeGift) {
+            messagesElement.innerHTML = `
+                <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; border-left: 4px solid #ffc107;">
+                    <strong>⚠️ Husk din gratis gave!</strong>
+                    <p style="margin: 0.5rem 0 0 0;">Du har optjent en gratis gave, men har ikke valgt en endnu.</p>
+                    <button onclick="renderSection('cart')" style="margin-top: 0.5rem; padding: 0.5rem 1rem; background: #2d5f2e; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Tilbage til kurv for at vælge gave
+                    </button>
+                </div>
+            `;
+        }
+        
+    } catch (error) {
+        console.error('Fejl ved indlæsning af checkout:', error);
+        summaryElement.innerHTML = '<p style="color: red;">Der opstod en fejl. Prøv igen.</p>';
+    }
+}
+
+// Handle checkout form submission
+async function handleCheckout(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const submitButton = event.target.querySelector('button[type="submit"]');
+    const messagesElement = document.getElementById('checkout-gift-messages');
+    
+    // Disable button
+    submitButton.disabled = true;
+    submitButton.textContent = 'Behandler...';
+    
+    try {
+        // DEBUG: Tjek session cookie
+        console.log('🍪 Session cookie:', document.cookie);
+        
+        // DEBUG: Hent cart først for at verificere
+        const cartCheck = await api.getCart();
+        console.log('📦 Cart før checkout:', cartCheck);
+        
+        if (!cartCheck || !cartCheck.items || cartCheck.items.length === 0) {
+            throw new Error('Kurven er tom. Tilføj produkter før checkout.');
+        }
+        
+        const orderData = {
+            customerName: formData.get('name'),
+            customerEmail: formData.get('email'),
+            customerPhone: formData.get('phone'),
+            deliveryAddress: `${formData.get('address')}, ${formData.get('zipCode')} ${formData.get('city')}`,
+            notes: formData.get('notes') || ''
+        };
+        
+        console.log('📤 Sender ordre data:', orderData);
+        
+        // Call API to place order
+        const result = await api.placeOrder(orderData);
+        
+        if (result && result.orderId) {
+            // TASK 2.3: Show order confirmation with gift
+            const content = document.getElementById('app-content');
+            content.innerHTML = sections.orderConfirmation(result);
+            
+            // Clear cart counter
+            updateCartCounter();
+            
+        } else if (result && result.giftRemoved) {
+            // TASK 3.2: Show message if gift was removed
+            messagesElement.innerHTML = `
+                <div style="background: #fff3cd; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #ffc107; margin-bottom: 1rem;">
+                    <strong>⚠️ Din gratis gave er ikke længere tilgængelig</strong>
+                    <p style="margin: 0.5rem 0 0 0;">Desværre er "${result.removedGiftName}" udsolgt. Din ordre er blevet opdateret uden gaven.</p>
+                    <button onclick="handleCheckout(event)" style="margin-top: 0.5rem; padding: 0.5rem 1rem; background: #2d5f2e; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Fortsæt uden gave
+                    </button>
+                </div>
+            `;
+            submitButton.disabled = false;
+            submitButton.textContent = 'Gennemfør bestilling';
+        } else {
+            throw new Error('Ukendt fejl');
+        }
+        
+    } catch (error) {
+        console.error('Checkout fejl:', error);
+        
+        // TASK 1.2: Show error message
+        messagesElement.innerHTML = `
+            <div style="background: #ffebee; padding: 1rem; border-radius: 8px; border-left: 4px solid #d32f2f;">
+                <strong>❌ Fejl ved gennemførelse af ordre</strong>
+                <p style="margin: 0.5rem 0 0 0;">${error.message || 'Der opstod en fejl. Prøv venligst igen.'}</p>
+            </div>
+        `;
+        
+        submitButton.disabled = false;
+        submitButton.textContent = 'Gennemfør bestilling';
+    }
 }
 
 
@@ -617,6 +1214,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Opdater navigation baseret på login status
   updateNavigation();
+  
+  // Opdater cart counter
+  updateCartCounter();
 
   // Vis kurv når kurv icon bliver trykket på 
   const cartBtn = document.querySelector('.cart-btn');
@@ -842,10 +1442,21 @@ function updateGiftStatus(cart) {
     // Ryd gamle klasser
     statusDiv.className = 'gift-status-box';
 
+    // TASK 3.3: Check if gift has been selected
+    if (cart.freeGift) {
+        statusDiv.textContent = "✅ Du har valgt din gratis gave!";
+        statusDiv.classList.add('gift-success');
+    }
     // Tjek om man kan vælge gave (Boolean fra Backend)
-    if (cart.canSelectFreeGift === true) {
-        // TASK 3.2: Vis Succes
-        statusDiv.textContent = "🎉 Tillykke! Du har optjent en gratis gave. Gå til 'Gaver' for at vælge.";
+    else if (cart.canSelectFreeGift === true) {
+        // TASK 3.2: Vis Succes med knap til at åbne modal
+        statusDiv.innerHTML = `
+            🎉 Tillykke! Du har optjent en gratis gave!
+            <button onclick="showGiftSelectionModal()" 
+                    style="margin-left: 10px; padding: 8px 16px; background: #2d5f2e; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                Vælg gave nu
+            </button>
+        `;
         statusDiv.classList.add('gift-success');
     } else {
         // TASK 2.3: Vis hvor meget der mangler
@@ -857,3 +1468,112 @@ function updateGiftStatus(cart) {
         statusDiv.classList.add('gift-warning');
     }
 }
+
+// ==========================================
+// TASK 2.2: GIFT SELECTION MODAL
+// ==========================================
+
+// Show gift selection modal popup
+async function showGiftSelectionModal() {
+    // Fetch available gifts
+    const gifts = await api.getGiftProducts();
+    
+    if (!gifts || gifts.length === 0) {
+        alert('Der er desværre ingen gaver tilgængelige i øjeblikket.');
+        return;
+    }
+
+    // Create modal HTML
+    const modalHtml = `
+        <div id="gift-modal" class="gift-modal">
+            <div class="gift-modal-content">
+                <div class="gift-modal-header">
+                    <h2>🎁 Vælg Din Gratis Gave!</h2>
+                    <p>Tillykke! Du har optjent en gratis gave. Vælg én gave nedenfor:</p>
+                    <button class="gift-modal-close" onclick="closeGiftModal()">&times;</button>
+                </div>
+                <div class="gift-modal-body">
+                    <div class="gift-options-grid">
+                        ${gifts.map(gift => {
+                            const isAvailable = gift.stockQuantity > 0;
+                            const disabledAttr = isAvailable ? '' : 'disabled';
+                            const disabledClass = isAvailable ? '' : 'disabled';
+                            
+                            return `
+                                <div class="gift-option ${disabledClass}">
+                                    <div class="gift-option-image">
+                                        ${getProductImage(gift)}
+                                    </div>
+                                    <div class="gift-option-info">
+                                        <h3>${gift.name}</h3>
+                                        <p>${gift.description || ''}</p>
+                                        <p class="gift-stock">Lager: ${gift.stockQuantity} stk.</p>
+                                        ${isAvailable 
+                                            ? `<button class="btn-select-gift" onclick="selectGiftFromModal(${gift.id}, '${gift.name}')">Vælg denne gave</button>`
+                                            : `<button class="btn-select-gift" disabled>Ikke på lager</button>`
+                                        }
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Add modal to body
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = modalHtml;
+    document.body.appendChild(modalContainer.firstElementChild);
+
+    // Show modal with animation
+    setTimeout(() => {
+        document.getElementById('gift-modal').classList.add('show');
+    }, 10);
+}
+
+// Close gift selection modal
+function closeGiftModal() {
+    const modal = document.getElementById('gift-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.remove();
+        }, 300);
+    }
+}
+
+// TASK 2.3: Handle gift selection from modal
+async function selectGiftFromModal(giftId, giftName) {
+    try {
+        // Show loading state
+        const modal = document.getElementById('gift-modal');
+        if (modal) {
+            modal.style.opacity = '0.6';
+            modal.style.pointerEvents = 'none';
+        }
+
+        // Call API to select gift
+        await api.selectFreeGift(giftId);
+
+        // Close modal
+        closeGiftModal();
+
+        // Show success message
+        alert(`🎉 Fantastisk! ${giftName} er blevet tilføjet til din kurv som en gratis gave!`);
+
+        // Reload cart to show updated data
+        await loadCart();
+
+    } catch (error) {
+        alert(`Fejl ved valg af gave: ${error.message}`);
+        // Reset modal state
+        const modal = document.getElementById('gift-modal');
+        if (modal) {
+            modal.style.opacity = '1';
+            modal.style.pointerEvents = 'auto';
+        }
+    }
+}
+
