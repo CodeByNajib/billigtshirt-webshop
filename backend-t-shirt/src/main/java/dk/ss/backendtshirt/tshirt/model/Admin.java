@@ -7,11 +7,6 @@ import jakarta.persistence.*;
 @Table(name = "ADMIN")
 public class Admin extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "admin_id")
-    private Long id;
-
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -30,14 +25,6 @@ public class Admin extends BaseEntity {
         this.email = email;
         this.name = name;
         this.password = password;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getEmail() {
