@@ -87,17 +87,16 @@ CREATE TABLE customers (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- 5. ADMINS TABLE
+-- 5. ADMIN TABLE (FIXED: matches Admin.java entity)
 -- ============================================
-CREATE TABLE admins (
+CREATE TABLE ADMIN (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    INDEX idx_username (username),
     INDEX idx_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -197,22 +196,20 @@ CREATE TABLE order_gifts (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- SUMMARY
+-- SCHEMA VERIFICATION
 -- ============================================
--- Database: tshirt_webshop
--- Tables created: 10
--- 1. products (T-shirt produkter)
--- 2. gift_products (Gratis gaver)
--- 3. gift_config (Gave konfiguration)
--- 4. customers (Kunder)
--- 5. admins (Administratorer)
--- 6. carts (Indkøbskurve)
--- 7. cart_items (Produkter i kurv)
--- 8. orders (Ordrer)
--- 9. order_items (Produkter i ordre)
--- 10. order_gifts (Gaver i ordre)
+-- This schema creates 10 tables:
+-- 1. products - Main product catalog
+-- 2. gift_products - Free gift items
+-- 3. gift_config - Gift promotion configuration
+-- 4. customers - Customer accounts
+-- 5. ADMIN - Admin accounts (matches Admin.java)
+-- 6. carts - Shopping carts
+-- 7. cart_items - Items in carts
+-- 8. orders - Customer orders
+-- 9. order_items - Items in orders (including free gifts)
+-- 10. order_gifts - Gift product assignments to orders
 -- ============================================
 
 -- Verify tables were created
 SHOW TABLES;
-
