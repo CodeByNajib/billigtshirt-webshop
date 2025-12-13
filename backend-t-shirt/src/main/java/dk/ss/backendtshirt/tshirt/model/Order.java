@@ -27,7 +27,23 @@ public class Order {
     @Column(name = "order_date")
     private LocalDateTime orderDate;
 
-    // Relation til Customer
+    // Direct customer information fields for checkout
+    @Column(name = "customer_name")
+    private String customerName;
+
+    @Column(name = "customer_email")
+    private String customerEmail;
+
+    @Column(name = "customer_phone")
+    private String customerPhone;
+
+    @Column(name = "delivery_address")
+    private String deliveryAddress;
+
+    @Column(name = "notes")
+    private String notes;
+
+    // Relation til Customer (optional - for registered users)
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
@@ -44,6 +60,11 @@ public class Order {
                  BigDecimal totalAmount,
                  BigDecimal originalGiftThreshold,
                  LocalDateTime orderDate,
+                 String customerName,
+                 String customerEmail,
+                 String customerPhone,
+                 String deliveryAddress,
+                 String notes,
                  Customer customer,
                  List<OrderGift> orderGifts) {
         this.id = id;
@@ -51,6 +72,11 @@ public class Order {
         this.totalAmount = totalAmount;
         this.originalGiftThreshold = originalGiftThreshold;
         this.orderDate = orderDate;
+        this.customerName = customerName;
+        this.customerEmail = customerEmail;
+        this.customerPhone = customerPhone;
+        this.deliveryAddress = deliveryAddress;
+        this.notes = notes;
         this.customer = customer;
         this.orderGifts = orderGifts;
     }
@@ -93,6 +119,46 @@ public class Order {
 
     public void setOrderDate(LocalDateTime orderDate) {
         this.orderDate = orderDate;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getCustomerEmail() {
+        return customerEmail;
+    }
+
+    public void setCustomerEmail(String customerEmail) {
+        this.customerEmail = customerEmail;
+    }
+
+    public String getCustomerPhone() {
+        return customerPhone;
+    }
+
+    public void setCustomerPhone(String customerPhone) {
+        this.customerPhone = customerPhone;
+    }
+
+    public String getDeliveryAddress() {
+        return deliveryAddress;
+    }
+
+    public void setDeliveryAddress(String deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     public Customer getCustomer() {
