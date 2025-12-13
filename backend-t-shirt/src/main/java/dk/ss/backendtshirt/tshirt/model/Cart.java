@@ -20,6 +20,10 @@ public class Cart {
     @Column(name = "create_at")
     private LocalDateTime created_At;
 
+    // Felt til at holde styr på valgt gratis gave
+    @Column(name = "free_gift_product_id")
+    private Long freeGiftProductId;
+
     // Relationen til produkterne
     @ManyToMany
     @JoinTable(
@@ -88,6 +92,14 @@ public class Cart {
 
     public void setCreated_At(LocalDateTime created_At) {
         this.created_At = created_At;
+    }
+
+    public Long getFreeGiftProductId() {
+        return freeGiftProductId;
+    }
+
+    public void setFreeGiftProductId(Long freeGiftProductId) {
+        this.freeGiftProductId = freeGiftProductId;
     }
 
     public List<Product> getItems() {

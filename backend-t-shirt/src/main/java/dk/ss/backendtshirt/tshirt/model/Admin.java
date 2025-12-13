@@ -1,18 +1,19 @@
 package dk.ss.backendtshirt.tshirt.model;
 
+import dk.ss.backendtshirt.common.model.BaseEntity;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "ADMIN")
-public class Admin {
+public class Admin extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "admin_id")
-    private Long id;
-
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String password;
 
     // --- CONSTRUCTORS, GETTERS & SETTERS ---
@@ -20,19 +21,10 @@ public class Admin {
     public Admin() {
     }
 
-    public Admin(Long id, String email, String name, String password) {
-        this.id = id;
+    public Admin(String email, String name, String password) {
         this.email = email;
         this.name = name;
         this.password = password;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getEmail() {
@@ -59,4 +51,3 @@ public class Admin {
         this.password = password;
     }
 }
-
