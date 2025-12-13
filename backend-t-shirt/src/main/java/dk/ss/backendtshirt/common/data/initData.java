@@ -8,11 +8,13 @@ import dk.ss.backendtshirt.tshirt.repository.GiftProductRepository;
 import dk.ss.backendtshirt.tshirt.repository.GiftConfigRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
 @Component
+@Profile("!test")  // Kør IKKE denne class når test profil er aktiv
 public class initData implements CommandLineRunner {
 
     private final ProductRepository productRepository;
