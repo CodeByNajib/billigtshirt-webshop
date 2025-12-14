@@ -1,7 +1,3 @@
-version: '3.8' #"Efter bogen" nuancen: Faktisk er den aller-nyeste standard
-#(kaldet "The Compose Specification"),
-#at man slet ikke behøver skrive version i toppen længere.
-
 services:
   app:
     build:
