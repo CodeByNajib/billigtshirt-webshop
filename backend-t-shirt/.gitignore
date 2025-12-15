@@ -52,6 +52,7 @@ build/
 !**/src/test/**/build/
 
 ### Application specific ###
+application.properties
 application-local.properties
 application-dev.properties
 application-prod.properties
