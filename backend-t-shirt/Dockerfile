@@ -4,7 +4,7 @@
 # Vi bruger et 'Multi-stage build' for at holde det endelige image småt.
 # Base Image: Maven på Eclipse Temurin 21 (Alpine Linux).
 # Hashpinning: Vi låser versionen med SHA256 for at sikre os mod Supply Chain Attacks.
-FROM maven:3.9-eclipse-temurin-21-alpine@sha256:922927df2c662cdd47ddb116443d6bec4696cfae3de1a0ddac8fcc7b87ce61ae AS builder
+FROM maven:3.9.11-eclipse-temurin-21-alpine@sha256:922927df2c662cdd47ddb116443d6bec4696cfae3de1a0ddac8fcc7b87ce61ae AS builder
 
 WORKDIR /app
 
