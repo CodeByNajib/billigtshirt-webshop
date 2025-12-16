@@ -149,10 +149,19 @@ const sections = {
                                 <span class="price">${formatPrice(
                                   product.price
                                 )}</span>
-                                <button class="add-to-cart" onclick="addToCart(${
-                                  product.id
-                                })">Tilføj</button>
+                                ${product.size ? `<span style="margin-left: 0.5rem; color: #5a6a5a; font-size: 0.9rem;">• Str. ${product.size}</span>` : ''}
                             </div>
+                            <div class="stock-info" style="margin-top: 0.5rem; font-size: 0.9rem;">
+                                ${product.stockQuantity > 0 
+                                  ? `<span style="color: #2d5f2e;">✓ ${product.stockQuantity} stk. på lager</span>` 
+                                  : `<span style="color: #d32f2f;">✗ Udsolgt</span>`}
+                            </div>
+                            <button 
+                                class="add-to-cart" 
+                                onclick="addToCart(${product.id})"
+                                ${product.stockQuantity <= 0 ? 'disabled style="background: #bdbdbd; cursor: not-allowed; opacity: 0.6;"' : ''}>
+                                ${product.stockQuantity > 0 ? 'Tilføj' : 'Udsolgt'}
+                            </button>
                         </div>
                     </div>
                 `
@@ -348,6 +357,12 @@ const sections = {
                                 <span class="price">${formatPrice(
                                   product.price
                                 )}</span>
+                                ${product.size ? `<span style="margin-left: 0.5rem; color: #5a6a5a; font-size: 0.9rem;">• Str. ${product.size}</span>` : ''}
+                            </div>
+                            <div class="stock-info" style="margin-top: 0.5rem; font-size: 0.9rem;">
+                                ${product.stockQuantity > 0 
+                                  ? `<span style="color: #2d5f2e;">✓ ${product.stockQuantity} på lager</span>` 
+                                  : `<span style="color: #d32f2f;">✗ Udsolgt</span>`}
                             </div>
                         </div>
                     </div>
@@ -385,6 +400,10 @@ const sections = {
                             <h3 style="color: #2d4a2d; margin-bottom: 1rem;">Produkt detaljer</h3>
                             <ul style="list-style: none; padding: 0;">
                                 <li style="padding: 0.5rem 0; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between;">
+                                    <span style="color: #5a6a5a;">Størrelse:</span>
+                                    <span style="font-weight: 500;">${product.size || 'One Size'}</span>
+                                </li>
+                                <li style="padding: 0.5rem 0; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between;">
                                     <span style="color: #5a6a5a;">Materiale:</span>
                                     <span style="font-weight: 500;">100% økologisk bomuld</span>
                                 </li>
@@ -396,6 +415,12 @@ const sections = {
                                     <span style="color: #5a6a5a;">Pleje:</span>
                                     <span style="font-weight: 500;">Maskinvask 30°</span>
                                 </li>
+                                <li style="padding: 0.5rem 0; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between;">
+                                    <span style="color: #5a6a5a;">Lagerstatus:</span>
+                                    <span style="font-weight: 500; ${product.stockQuantity > 0 ? 'color: #2d5f2e;' : 'color: #d32f2f;'}">
+                                        ${product.stockQuantity > 0 ? `✓ ${product.stockQuantity} stk. på lager` : '✗ Udsolgt'}
+                                    </span>
+                                </li>
                                 <li style="padding: 0.5rem 0; display: flex; justify-content: space-between;">
                                     <span style="color: #5a6a5a;">Produkt ID:</span>
                                     <span style="font-weight: 500;">#${product.id}</span>
@@ -403,8 +428,16 @@ const sections = {
                             </ul>
                         </div>
                         
-                        <button onclick="addToCartFromDetail(${product.id})" class="add-to-cart-large" style="width: 100%; padding: 1.2rem 2rem; background: linear-gradient(135deg, #2d5f2e 0%, #4a8c4a 100%); color: white; border: none; border-radius: 12px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 12px rgba(45, 95, 46, 0.3);">
-                            🛒 Tilføj til kurv
+                        <button 
+                            onclick="${product.stockQuantity > 0 ? `addToCartFromDetail(${product.id})` : 'return false;'}" 
+                            ${product.stockQuantity <= 0 ? 'disabled' : ''}
+                            class="add-to-cart-large" 
+                            style="width: 100%; padding: 1.2rem 2rem; 
+                                ${product.stockQuantity > 0 
+                                    ? 'background: linear-gradient(135deg, #2d5f2e 0%, #4a8c4a 100%); cursor: pointer; box-shadow: 0 4px 12px rgba(45, 95, 46, 0.3);' 
+                                    : 'background: #bdbdbd; cursor: not-allowed; opacity: 0.6; filter: blur(0.5px);'}
+                                color: white; border: none; border-radius: 12px; font-size: 1.2rem; font-weight: bold; transition: all 0.3s;">
+                            ${product.stockQuantity > 0 ? '🛒 Tilføj til kurv' : '✗ Udsolgt'}
                         </button>
                         
                         <div style="margin-top: 2rem; padding: 1rem; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #2d5f2e;">
@@ -647,17 +680,45 @@ async function addToCartFromDetail(productId) {
 // Add to cart function - nu med backend integration
 async function addToCart(productId) {
   const product = products.find((p) => p.id === productId);
+  
+  if (!product) return;
+  
+  // Check if out of stock
+  if (product.stockQuantity <= 0) {
+    console.log('Produkt er udsolgt');
+    return;
+  }
+  
+  // Check current quantity in cart
+  try {
+    const cartData = await api.getCart();
+    const existingItem = cartData.items?.find(item => {
+      const itemId = item.productId || item.id;
+      return itemId === productId;
+    });
+    
+    const currentQuantityInCart = existingItem ? existingItem.quantity : 0;
+    
+    // Check if adding one more would exceed stock
+    if (currentQuantityInCart >= product.stockQuantity) {
+      console.log(`Kan ikke tilføje flere - kun ${product.stockQuantity} på lager`);
+      return;
+    }
+  } catch (error) {
+    console.error('Fejl ved check af lager:', error);
+  }
 
   // Prøv at tilføje til backend kurv
   const result = await api.addToCart(productId, 1);
 
   if (result) {
-    alert(`${product.name} tilføjet til kurven! 🛒`);
     // Update cart counter
     updateCartCounter();
+    // Refresh products to get updated stock
+    await loadProducts();
   } else {
     // Fallback hvis backend ikke virker
-    alert(`${product.name} tilføjet til kurven! 🛒 (Offline mode)`);
+    updateCartCounter();
   }
 }
 
@@ -808,7 +869,7 @@ function renderCartItems(cart, contentElement, footerElement) {
 // Update cart counter badge
 async function updateCartCounter() {
     try {
-        const response = await fetch('http://localhost:8080/api/cart', {
+        const response = await fetch(`${API_BASE_URL}/cart`, {
             credentials: 'include'
         });
         
@@ -852,6 +913,19 @@ async function updateCartCounter() {
 
 // Increase quantity
 async function increaseQuantity(productId, currentQuantity) {
+    const product = products.find(p => p.id === productId);
+    
+    if (!product) {
+        console.error('Produkt ikke fundet');
+        return;
+    }
+    
+    // Check if we can increase
+    if (currentQuantity >= product.stockQuantity) {
+        alert(`Der er kun ${product.stockQuantity} stk. på lager af dette produkt.`);
+        return;
+    }
+    
     const newQuantity = currentQuantity + 1;
     await updateQuantity(productId, newQuantity);
 }
@@ -878,6 +952,14 @@ async function updateQuantity(productId, newQuantity) {
     // Validate quantity
     if (isNaN(quantity) || quantity < 0) {
         alert('Ugyldig antal. Venligst indtast et positivt tal.');
+        await loadCart(); // Reload to reset
+        return;
+    }
+    
+    // Check stock availability
+    const product = products.find(p => p.id === productId);
+    if (product && quantity > product.stockQuantity) {
+        alert(`Der er kun ${product.stockQuantity} stk. på lager af dette produkt.`);
         await loadCart(); // Reload to reset
         return;
     }
@@ -971,7 +1053,7 @@ async function loadCheckoutSummary() {
     if (!summaryElement) return;
     
     try {
-        const response = await fetch('http://localhost:8080/api/cart', {
+        const response = await fetch(`${API_BASE_URL}/cart`, {
             credentials: 'include'
         });
         
@@ -1093,6 +1175,9 @@ async function handleCheckout(event) {
             const content = document.getElementById('app-content');
             content.innerHTML = sections.orderConfirmation(result);
             
+            // Refresh products to update stock quantities
+            await loadProducts();
+            
             // Clear cart counter
             updateCartCounter();
             
@@ -1138,26 +1223,31 @@ async function handleLogin(event) {
   const password = formData.get("password");
 
   const result = await api.login(email, password);
+  
+  console.log('Login result:', result);
 
-  if (result && result.token) {
+  if (result && (result.token || result.id || result.email)) {
     // Gem bruger data i localStorage
-    localStorage.setItem("authToken", result.token);
+    if (result.token) {
+      localStorage.setItem("authToken", result.token);
+    }
     localStorage.setItem("userId", result.id);
-    localStorage.setItem("userEmail", result.email);
-    localStorage.setItem("userName", result.name);
-    localStorage.setItem("userType", result.userType);
+    localStorage.setItem("userEmail", result.email || email);
+    localStorage.setItem("userName", result.name || result.firstname || result.email);
+    localStorage.setItem("userType", result.userType || result.role || "CUSTOMER");
 
     // Opdater navigation
     updateNavigation();
 
     alert(
       `${result.message || "Login succesfuldt!"}\nVelkommen tilbage, ${
-        result.name
+        result.name || result.firstname || email
       }! 🎉`
     );
 
     // Redirect baseret på userType
-    if (result.userType === "ADMIN") {
+    const userType = result.userType || result.role || "CUSTOMER";
+    if (userType === "ADMIN") {
       // Vis admin panel hvis det er en admin
       if (typeof renderAdminSection === "function") {
         renderAdminSection();
@@ -1264,13 +1354,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // Function to fetch and render GIFTS
 async function loadGiftProducts() {
-  const GIFT_API_URL = "http://localhost:8080/api/gift-products"; // Endpoint
   const container = document.getElementById("gift-container");
 
   if (!container) return; // Safety check
 
   try {
-    const response = await fetch(GIFT_API_URL);
+    const response = await fetch(`${API_BASE_URL}/gift-products`);
     const gifts = await response.json();
 
     // Clear "Loading..." text
@@ -1479,7 +1568,7 @@ async function showGiftSelectionModal() {
     const gifts = await api.getGiftProducts();
     
     if (!gifts || gifts.length === 0) {
-        alert('Der er desværre ingen gaver tilgængelige i øjeblikket.');
+        console.log('Ingen gaver tilgængelige');
         return;
     }
 
@@ -1560,14 +1649,11 @@ async function selectGiftFromModal(giftId, giftName) {
         // Close modal
         closeGiftModal();
 
-        // Show success message
-        alert(`🎉 Fantastisk! ${giftName} er blevet tilføjet til din kurv som en gratis gave!`);
-
-        // Reload cart to show updated data
+        // Reload cart to show updated data with gift
         await loadCart();
 
     } catch (error) {
-        alert(`Fejl ved valg af gave: ${error.message}`);
+        console.error('Fejl ved valg af gave:', error.message);
         // Reset modal state
         const modal = document.getElementById('gift-modal');
         if (modal) {
