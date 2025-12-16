@@ -32,12 +32,12 @@ public class initData implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-//        // Only initialize if database is empty
-//        if (productRepository.count() == 0 && giftProductRepository.count() == 0) {
-//            initializeProducts();
-//            initializeGiftProducts();
-//            initializeGiftConfig();
-//        }
+        // Only initialize if database is empty
+        if (productRepository.count() == 0 && giftProductRepository.count() == 0) {
+            initializeProducts();
+            initializeGiftProducts();
+            initializeGiftConfig();
+        }
     }
 
     private void initializeProducts() {

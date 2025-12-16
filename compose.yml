@@ -1,0 +1,59 @@
+services:
+  app:
+    build:
+      context: ./backend-t-shirt
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      # 1. Her er magien: Vi mapper din lokale mappe ind i containeren
+      - ./backend-t-shirt/src/main/resources/db/migration:/flyway/sql
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - PROD_DATABASE_URL=jdbc:mysql://db:3306/billigtshirtdb?allowPublicKeyRetrieval=true&useSSL=false
+      - PROD_USERNAME=user
+      - PROD_PASSWORD=password
+
+      # 2. Fortæl Flyway at den skal bruge fil-systemet (ikke classpath)
+      - SPRING_FLYWAY_LOCATIONS=filesystem:/flyway/sql
+
+      # 3. Aktiver Flyway og bed Hibernate om at slappe af
+      - SPRING_FLYWAY_LOCATIONS=filesystem:/flyway/sql
+      - SPRING_FLYWAY_ENABLED=true
+      - SPRING_FLYWAY_BASELINE_ON_MIGRATE=true
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+
+      # 4. Tænd for DEBUG logs, så vi kan se, hvad Flyway laver
+      - LOGGING_LEVEL_ORG_FLYWAYDB=DEBUG
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+     build: ./frontend-t-shirt
+     container_name: frontend
+     ports:
+       - "80:80"
+     depends_on:
+       - app
+  db:
+    image: mysql:8.0@sha256:0275a35e79c60caae68fac520602d9f6897feb9b0941a1471196b1a01760e581
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: billigtshirtdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  db-data:

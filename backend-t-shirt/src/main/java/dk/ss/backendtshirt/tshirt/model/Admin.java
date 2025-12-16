@@ -4,7 +4,7 @@ import dk.ss.backendtshirt.common.model.BaseEntity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "ADMIN")
+@Table(name = "admin")
 public class Admin extends BaseEntity {
 
     @Column(nullable = false, unique = true)
