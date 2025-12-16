@@ -60,9 +60,8 @@ async function loadProducts() {
     ];
   }
 
-  // Render siden efter produkter er hentet
-  const currentSection = getCurrentSection();
-  renderSection(currentSection);
+  // Note: Removed auto-render to prevent unwanted navigation
+  // Call renderSection manually after loadProducts if needed
 }
 
 // Hjælpefunktion til at formatere pris
@@ -624,7 +623,11 @@ const sections = {
 // Render function
 function renderSection(sectionName) {
   const content = document.getElementById("app-content");
-  if (sections[sectionName]) {
+  
+  // Handle orderConfirmation specially
+  if (sectionName === 'orderConfirmation' && window.currentOrder) {
+    content.innerHTML = sections.orderConfirmation(window.currentOrder);
+  } else if (sections[sectionName]) {
     content.innerHTML = sections[sectionName]();
   }
 
@@ -646,6 +649,9 @@ function renderSection(sectionName) {
     link.style.color =
       link.dataset.section === sectionName ? "#4a8c4a" : "#2d4a2d";
   });
+  
+  // Scroll to top when navigating to a new section
+  window.scrollTo(0, 0);
 }
 
 // Get current section from URL or default
@@ -1171,12 +1177,14 @@ async function handleCheckout(event) {
         const result = await api.placeOrder(orderData);
         
         if (result && result.orderId) {
-            // TASK 2.3: Show order confirmation with gift
-            const content = document.getElementById('app-content');
-            content.innerHTML = sections.orderConfirmation(result);
+            // Store order result for confirmation page
+            window.currentOrder = result;
             
-            // Refresh products to update stock quantities
+            // Refresh products to update stock quantities (without re-rendering)
             await loadProducts();
+            
+            // Navigate to order confirmation - MUST be after loadProducts
+            renderSection('orderConfirmation');
             
             // Clear cart counter
             updateCartCounter();
