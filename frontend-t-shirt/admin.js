@@ -561,6 +561,11 @@ function setupProductForm() {
                     
                     loadProductsAdmin();
                     
+                    // Refresh products in main app
+                    if (typeof loadProducts === 'function') {
+                        await loadProducts();
+                    }
+                    
                     // Skift til inventory tab efter opdatering
                     if (editId) {
                         setTimeout(() => showProductTab('inventory'), 1000);
@@ -587,6 +592,11 @@ async function deleteProduct(id) {
         if (response.ok) {
             showProductMessage('Produkt slettet!', 'green');
             loadProductsAdmin();
+            
+            // Refresh products in main app
+            if (typeof loadProducts === 'function') {
+                await loadProducts();
+            }
         } else {
             showProductMessage('Fejl ved sletning', 'red');
         }
