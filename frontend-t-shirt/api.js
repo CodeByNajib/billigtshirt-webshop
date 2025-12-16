@@ -26,6 +26,10 @@ const api = {
     async addToCart(productId, quantity = 1) {
         try {
             const token = localStorage.getItem('authToken');
+            const requestBody = { productId, quantity };
+            
+            console.log('🛒 Adding to cart:', requestBody);
+            
             const response = await fetch(`${API_BASE_URL}/cart`, {
                 method: 'POST',
                 headers: {
@@ -33,10 +37,20 @@ const api = {
                     'Authorization': token ? `Bearer ${token}` : ''
                 },
                 credentials: 'include',
-                body: JSON.stringify({ productId, quantity })
+                body: JSON.stringify(requestBody)
             });
-            if (!response.ok) throw new Error('Kunne ikke tilføje til kurv');
-            return await response.json();
+            
+            console.log('Cart response status:', response.status);
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                console.error('❌ Backend error:', errorData);
+                throw new Error(errorData?.message || 'Kunne ikke tilføje til kurv');
+            }
+            
+            const result = await response.json();
+            console.log('✅ Added to cart:', result);
+            return result;
         } catch (error) {
             console.error('Fejl ved tilføjelse til kurv:', error);
             return null;
@@ -112,6 +126,7 @@ const api = {
 
     async login(email, password) {
         try {
+            console.log('🔐 Attempting login:', email);
             const response = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: 'POST',
                 headers: {
@@ -121,12 +136,16 @@ const api = {
                 body: JSON.stringify({ email, password })
             });
             
+            console.log('Login response status:', response.status);
+            
             if (!response.ok) {
                 const errorData = await response.json().catch(() => null);
+                console.error('Login error:', errorData);
                 throw new Error(errorData?.message || 'Login fejlede');
             }
             
             const data = await response.json();
+            console.log('✅ Login successful:', data);
             
             // Gem token hvis backend sender en
             if (data.token) {
