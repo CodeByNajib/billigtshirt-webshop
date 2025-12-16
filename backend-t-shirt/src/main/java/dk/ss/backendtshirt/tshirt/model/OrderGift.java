@@ -3,7 +3,7 @@ package dk.ss.backendtshirt.tshirt.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "ORDER_GIFT")
+@Table(name = "order_gift")
 public class OrderGift {
 
     @Id

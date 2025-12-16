@@ -1,37 +1,40 @@
-name: CI - Compile & Test
+name: CI/CD Pipeline - Billig T-Shirt
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build:
+  # --- JOB 1: TEST & COMPILE  ---
+  build-and-test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       # 1. Tjek koden ud
       - name: Checkout code
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1 ,  Date (2025-11-13)
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1 , Date (2025-11-13)
 
       # 2. Opsæt JDK 21
       - name: Set up JDK 21
-        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1,  Date (2025-03-14)
+        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1, Date (2025-03-14)
         with:
           java-version: '21'
           distribution: 'temurin'
 
       # 3. Cache Maven dependencies
-          # path = hvad vi gemmer
-          #key = hvilken version af cachen der passer til vores pom.xml
-          #restore-keys = backup-cache hvis key ikke matcher
-
       - name: Cache Maven packages
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0, Date (2024-09-24)
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-m2-${{ hashFiles('backend-t-shirt/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-m2
 
@@ -44,3 +47,55 @@ jobs:
       - name: Run tests
         run: mvn test
         working-directory: backend-t-shirt
+
+  # --- JOB 2: BUILD DOCKER & DEPLOY ---
+  package-and-deploy:
+    needs: build-and-test
+    # Kør kun deploy ved push til main (ikke PR)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # Genbruger vores checkout hash for konsistens
+      - name: Checkout code
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+
+      # Login til GitHub Container Registry
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1 # v3.0.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7 # v5.0.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha
+            latest
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@f2a1d5e99d037542a71f4388784d0847790a1618 # v5.0.0
+        with:
+          context: ./backend-t-shirt
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Deploy to DigitalOcean
+        uses: digitalocean/app_action@e8584825925e01933c09199d2d0961725b84294b # v2.5.1
+        with:
+          app_name: billig-t-shirt
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          images: '[
+            {
+              "name": "billig-t-shirt-service",
+              "image": "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}"
+            }
+          ]'

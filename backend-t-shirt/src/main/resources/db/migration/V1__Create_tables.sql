@@ -6,16 +6,6 @@
 -- Database: tshirt_webshop
 -- ============================================
 
--- Drop database if exists (CAUTION: This deletes all data!)
-DROP DATABASE IF EXISTS tshirt_webshop;
-
--- Create database
-CREATE DATABASE tshirt_webshop
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
-
--- Use the database
-USE tshirt_webshop;
 
 -- ============================================
 -- 1. PRODUCTS TABLE
@@ -89,7 +79,7 @@ CREATE TABLE customers (
 -- ============================================
 -- 5. ADMIN TABLE (FIXED: matches Admin.java entity)
 -- ============================================
-CREATE TABLE ADMIN (
+CREATE TABLE admin (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,

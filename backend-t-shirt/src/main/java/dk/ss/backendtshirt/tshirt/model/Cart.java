@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "CART")
+@Table(name = "carts")
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,7 +17,7 @@ public class Cart {
     @Column(name = "total_amount")
     private BigDecimal totalAmount = BigDecimal.ZERO; // Starter på 0
 
-    @Column(name = "create_at")
+    @Column(name = "created_at")
     private LocalDateTime created_At;
 
     // Felt til at holde styr på valgt gratis gave
@@ -27,7 +27,7 @@ public class Cart {
     // Relationen til produkterne
     @ManyToMany
     @JoinTable(
-            name = "cart_products",
+            name = "cart_items",
             joinColumns = @JoinColumn(name = "cart_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
