@@ -7,11 +7,15 @@ public class CheckoutRequest {
     private String deliveryAddress;
     private String notes;
 
+
     public CheckoutRequest() {
     }
 
-    public CheckoutRequest(String customerName, String customerEmail, String customerPhone,
-                           String deliveryAddress, String notes) {
+    public CheckoutRequest(String customerName,
+                           String customerEmail,
+                           String customerPhone,
+                           String deliveryAddress,
+                           String notes) {
         this.customerName = customerName;
         this.customerEmail = customerEmail;
         this.customerPhone = customerPhone;

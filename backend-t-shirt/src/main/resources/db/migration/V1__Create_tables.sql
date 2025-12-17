@@ -70,6 +70,9 @@ CREATE TABLE customers (
     email VARCHAR(255) NOT NULL UNIQUE,
     phone VARCHAR(20),
     password VARCHAR(255) NOT NULL,
+    address VARCHAR(255) NULL,
+    city VARCHAR(255) NULL,
+    postal_code VARCHAR(20) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -122,8 +125,7 @@ CREATE TABLE cart_items (
     FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
     INDEX idx_cart (cart_id),
-    INDEX idx_product (product_id),
-    UNIQUE KEY unique_cart_product (cart_id, product_id)
+    INDEX idx_product (product_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
@@ -138,10 +140,13 @@ CREATE TABLE orders (
     delivery_address TEXT NOT NULL,
     notes TEXT,
     total_amount DECIMAL(10, 2) NOT NULL,
-    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    original_gift_threshold DECIMAL(10,2) NOT NULL,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Tilføjet for at matche Order.java
+    customer_id BIGINT, -- Tilføjet for at understøtte @ManyToOne relationen
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
+    CONSTRAINT fk_order_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL,
     INDEX idx_order_number (order_number),
     INDEX idx_customer_email (customer_email),
     INDEX idx_order_date (order_date)

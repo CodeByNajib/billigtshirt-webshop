@@ -230,7 +230,7 @@ const sections = {
                         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 1rem;">
                             <div class="form-group">
                                 <label style="display: block; margin-bottom: 0.5rem; color: #5a6a5a; font-weight: 500;">Postnr.</label>
-                                <input type="text" name="zipCode" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;" placeholder="1234">
+                                <input type="text" name="postalCode" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;" placeholder="1234">
                             </div>
                             <div class="form-group">
                                 <label style="display: block; margin-bottom: 0.5rem; color: #5a6a5a; font-weight: 500;">By</label>
@@ -1167,7 +1167,7 @@ async function handleCheckout(event) {
             customerName: formData.get('name'),
             customerEmail: formData.get('email'),
             customerPhone: formData.get('phone'),
-            deliveryAddress: `${formData.get('address')}, ${formData.get('zipCode')} ${formData.get('city')}`,
+            deliveryAddress: `${formData.get('address')}, ${formData.get('postalCode')} ${formData.get('city')}`, // Vi bruger det nye navn
             notes: formData.get('notes') || ''
         };
         
@@ -1222,87 +1222,83 @@ async function handleCheckout(event) {
     }
 }
 
+// ==========================================
+// AUTHENTICATION HANDLERS
+// ==========================================
 
-// Login handler
+// Login handler - OPDATERET MED VARIABLER
 async function handleLogin(event) {
-  event.preventDefault();
-  const formData = new FormData(event.target);
-  const email = formData.get("email");
-  const password = formData.get("password");
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    
+    // HENT VARIABLER FRA FORM (Dette manglede!)
+    const email = formData.get("email");
+    const password = formData.get("password");
 
-  const result = await api.login(email, password);
-  
-  console.log('Login result:', result);
+    console.log('🔐 Forsøger login for:', email);
 
-  if (result && (result.token || result.id || result.email)) {
-    // Gem bruger data i localStorage
-    if (result.token) {
-      localStorage.setItem("authToken", result.token);
-    }
-    localStorage.setItem("userId", result.id);
-    localStorage.setItem("userEmail", result.email || email);
-    localStorage.setItem("userName", result.name || result.firstname || result.email);
-    localStorage.setItem("userType", result.userType || result.role || "CUSTOMER");
+    const result = await api.login(email, password);
+    
+    if (result && (result.token || result.id || result.email)) {
+        // Gem bruger data i localStorage
+        if (result.token) localStorage.setItem("authToken", result.token);
+        localStorage.setItem("userId", result.id);
+        localStorage.setItem("userEmail", result.email || email);
+        localStorage.setItem("userName", result.name || result.firstname || result.email);
+        localStorage.setItem("userType", result.userType || result.role || "CUSTOMER");
 
-    // Opdater navigation
-    updateNavigation();
+        updateNavigation();
 
-    alert(
-      `${result.message || "Login succesfuldt!"}\nVelkommen tilbage, ${
-        result.name || result.firstname || email
-      }! 🎉`
-    );
+        alert(`Login succesfuldt! Velkommen tilbage, ${result.name || result.firstname || email}! 🎉`);
 
-    // Redirect baseret på userType
-    const userType = result.userType || result.role || "CUSTOMER";
-    if (userType === "ADMIN") {
-      // Vis admin panel hvis det er en admin
-      if (typeof renderAdminSection === "function") {
-        renderAdminSection();
-      }
+        const userType = result.userType || result.role || "CUSTOMER";
+        if (userType === "ADMIN") {
+            if (typeof renderAdminSection === "function") renderAdminSection();
+        } else {
+            renderSection("shop");
+        }
     } else {
-      // Vis shop for almindelige kunder
-      renderSection("shop");
+        alert("Login fejlede. Tjek venligst din email og adgangskode.");
     }
-  } else {
-    alert("Login fejlede. Tjek venligst din email og adgangskode.");
-  }
 }
 
-// Signup handler
+// Signup handler - OPDATERET MED VARIABLER OG ADRESSE
 async function handleSignup(event) {
-  event.preventDefault();
-  const formData = new FormData(event.target);
+    event.preventDefault();
+    const formData = new FormData(event.target);
 
-  const password = formData.get("password");
-  const confirmPassword = formData.get("confirmPassword");
+    // 1. DU SKAL DEFINERE DISSE VARIABLER FØRST (Det er her fejlen ligger)
+    const password = formData.get("password");
+    const confirmPassword = formData.get("confirmPassword");
 
-  // Tjek om adgangskoder matcher
-  if (password !== confirmPassword) {
-    alert("Adgangskoderne matcher ikke!");
-    return;
-  }
+    // 2. Tjek om de matcher
+    if (password !== confirmPassword) {
+        alert("Adgangskoderne matcher ikke!");
+        return;
+    }
 
-  const userData = {
-    firstname: formData.get("firstname"),
-    lastname: formData.get("lastname"),
-    email: formData.get("email"),
-    password: password,
-  };
+    // 3. Nu kan du bygge dit objekt, fordi 'password' nu er defineret som en variabel
+    const userData = {
+        firstname: formData.get("firstname"),
+        lastname: formData.get("lastname"),
+        email: formData.get("email"),
+        password: password, // Nu peger denne på variablen fra linje 6
+        address: formData.get("address") || "",
+        city: formData.get("city") || "",
+        postalCode: formData.get("postalCode") || "", 
+        phone: formData.get("phone") || ""
+    };
 
-  const result = await api.signup(userData);
+    console.log("📤 Sender signup data:", userData);
 
-  if (result && result.id) {
-    alert(
-      `Konto oprettet succesfuldt!\nVelkommen til BilligT-Shirt, ${userData.firstname}! 🎉\n\nDu kan nu logge ind med din email.`
-    );
-    // Redirect til login efter signup
-    renderSection("login");
-  } else {
-    alert(
-      "Registrering fejlede. Email er måske allerede i brug. Prøv venligst igen."
-    );
-  }
+    const result = await api.signup(userData);
+
+    if (result && result.id) {
+        alert(`Konto oprettet! Velkommen, ${userData.firstname}! 🎉`);
+        renderSection("login");
+    } else {
+        alert("Registrering fejlede: " + (result?.message || "Email er måske allerede i brug."));
+    }
 }
 
 // Navigation click handlers

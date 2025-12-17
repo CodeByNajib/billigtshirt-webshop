@@ -1,5 +1,6 @@
 package dk.ss.backendtshirt.tshirt.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -52,6 +53,10 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderGift> orderGifts = new ArrayList<>();
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // Tilføj denne!
+    private List<OrderItem> orderItems = new ArrayList<>();
+
 
     public Order() {
     }
@@ -66,7 +71,8 @@ public class Order {
                  String deliveryAddress,
                  String notes,
                  Customer customer,
-                 List<OrderGift> orderGifts) {
+                 List<OrderGift> orderGifts,
+                 List<OrderItem> orderItems) {
         this.id = id;
         this.orderNumber = orderNumber;
         this.totalAmount = totalAmount;
@@ -79,6 +85,7 @@ public class Order {
         this.notes = notes;
         this.customer = customer;
         this.orderGifts = orderGifts;
+        this.orderItems = orderItems;
     }
 
     public Long getId() {
@@ -177,9 +184,23 @@ public class Order {
         this.orderGifts = orderGifts;
     }
 
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
+    }
+
     // Hjælper-metode til at tilføje en gave nemt
     public void addGift(OrderGift gift) {
         orderGifts.add(gift);
         gift.setOrder(this);
+    }
+
+    // Hjælper-metode til at tilføje en varelinje nemt
+    public void addOrderItem(OrderItem item) {
+        orderItems.add(item);
+        item.setOrder(this);
     }
 }

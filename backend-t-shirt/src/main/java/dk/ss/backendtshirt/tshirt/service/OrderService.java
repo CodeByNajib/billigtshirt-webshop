@@ -175,16 +175,37 @@ public class OrderService {
         order.setOrderDate(LocalDateTime.now());
         order.setOriginalGiftThreshold(giftService.getCurrentThreshold());
 
-        // Set customer information directly on order
         order.setCustomerName(request.getCustomerName());
         order.setCustomerEmail(request.getCustomerEmail());
         order.setCustomerPhone(request.getCustomerPhone());
         order.setDeliveryAddress(request.getDeliveryAddress());
         order.setNotes(request.getNotes());
 
-        log.info("Creating order for customer: {}, Total: {}", request.getCustomerName(), cart.getTotalAmount());
+        // NYT: Gruppér produkter for at tælle antal (quantity)
+        Map<Long, OrderItem> itemMap = new HashMap<>();
 
-        return orderRepository.save(order);
+        for (Product product : cart.getItems()) {
+            if (itemMap.containsKey(product.getId())) {
+                OrderItem existing = itemMap.get(product.getId());
+                existing.setQuantity(existing.getQuantity() + 1);
+                existing.setRowTotal(existing.getPricePerUnit().multiply(new BigDecimal(existing.getQuantity())));
+            } else {
+                OrderItem newItem = new OrderItem();
+                newItem.setProduct(product);
+                newItem.setProductName(product.getName());
+                newItem.setQuantity(1);
+                newItem.setPricePerUnit(product.getPrice());
+                newItem.setRowTotal(product.getPrice());
+
+                // Brug hjælper-metoden fra Order.java
+                order.addOrderItem(newItem);
+                itemMap.put(product.getId(), newItem);
+            }
+        }
+
+        log.info("Creating order for customer: {}, with {} items", request.getCustomerName(), itemMap.size());
+
+        return orderRepository.save(order); // Dette gemmer nu både Order OG OrderItems pga. CascadeType.ALL
     }
 
     /**

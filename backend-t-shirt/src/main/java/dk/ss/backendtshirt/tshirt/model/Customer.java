@@ -31,7 +31,6 @@ public class Customer extends BaseEntity {
     private List<Order> orders = new ArrayList<>();
 
     // --- CONSTRUCTORS ---
-
     public Customer() {
     }
 

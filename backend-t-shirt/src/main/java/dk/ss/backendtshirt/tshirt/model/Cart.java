@@ -1,5 +1,6 @@
 package dk.ss.backendtshirt.tshirt.model;
 
+import dk.ss.backendtshirt.common.model.BaseEntity;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -9,16 +10,12 @@ import java.util.List;
 
 @Entity
 @Table(name = "carts")
-public class Cart {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Cart extends BaseEntity {
+
 
     @Column(name = "total_amount")
     private BigDecimal totalAmount = BigDecimal.ZERO; // Starter på 0
 
-    @Column(name = "created_at")
-    private LocalDateTime created_At;
 
     // Felt til at holde styr på valgt gratis gave
     @Column(name = "free_gift_product_id")
@@ -37,14 +34,11 @@ public class Cart {
 
     // 1. No-Args Constructor (Bruges når man laver en ny tom kurv)
     public Cart() {
-        this.created_At = LocalDateTime.now(); // Sætter tidspunkt automatisk
     }
 
     // 2. All-Args Constructor (Bruges sjældent manuelt, men god at have)
-    public Cart(Long id, BigDecimal totalAmount, LocalDateTime created_At) {
-        this.id = id;
+    public Cart( BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
-        this.created_At = created_At;
     }
 
     // --- HJÆLPEMETODER (Logik til kurven) ---
@@ -69,15 +63,6 @@ public class Cart {
     }
 
     // --- GETTERS & SETTERS ---
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public BigDecimal getTotalAmount() {
         return totalAmount;
     }
@@ -86,13 +71,6 @@ public class Cart {
         this.totalAmount = totalAmount;
     }
 
-    public LocalDateTime getCreated_At() {
-        return created_At;
-    }
-
-    public void setCreated_At(LocalDateTime created_At) {
-        this.created_At = created_At;
-    }
 
     public Long getFreeGiftProductId() {
         return freeGiftProductId;
