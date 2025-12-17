@@ -9,6 +9,7 @@ import dk.ss.backendtshirt.tshirt.repository.AdminRepository;
 import dk.ss.backendtshirt.tshirt.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -22,28 +23,35 @@ public class AuthService {
     @Autowired
     private AdminRepository adminRepository;
 
+    @Transactional
     public AuthResponseDTO signup(SignupRequestDTO request) {
-        // Check if email already exists in either Customer or Admin table
+        // 1. Tjek om email allerede findes i Customer eller Admin tabellen
         if (customerRepository.existsByEmail(request.getEmail()) ||
-            adminRepository.existsByEmail(request.getEmail())) {
+                adminRepository.existsByEmail(request.getEmail())) {
             AuthResponseDTO response = new AuthResponseDTO();
             response.setMessage("Email allerede i brug");
             return response;
         }
 
-        // Create new customer (signup is only for customers)
+        // 2. Opret ny kunde (signup er kun for kunder)
         Customer customer = new Customer();
         customer.setEmail(request.getEmail());
         customer.setName(request.getFirstname() + " " + request.getLastname());
-        customer.setPassword(request.getPassword()); // Note: In production, hash this password!
+        customer.setPassword(request.getPassword()); // Husk hashing i produktion!
 
-        // Save customer
+        // --- NYT: Overfør adresseoplysninger fra DTO til Entitet ---
+        customer.setAddress(request.getAddress());
+        customer.setCity(request.getCity());
+        customer.setPostalCode(request.getPostalCode());
+        customer.setPhone(request.getPhone());
+
+        // 3. Gem kunden i databasen
         Customer savedCustomer = customerRepository.save(customer);
 
-        // Generate simple token (in production, use JWT)
+        // 4. Generer token
         String token = UUID.randomUUID().toString();
 
-        // Return success response
+        // 5. Returner succes-respons
         return new AuthResponseDTO(
                 savedCustomer.getId(),
                 savedCustomer.getEmail(),
@@ -55,23 +63,20 @@ public class AuthService {
     }
 
     public AuthResponseDTO login(LoginRequestDTO request) {
-        // Try to find user in Customer table first
+        // Prøv at finde brugeren i Customer-tabellen først
         Optional<Customer> customerOpt = customerRepository.findByEmail(request.getEmail());
 
         if (customerOpt.isPresent()) {
             Customer customer = customerOpt.get();
 
-            // Check password
             if (!customer.getPassword().equals(request.getPassword())) {
                 AuthResponseDTO response = new AuthResponseDTO();
                 response.setMessage("Forkert email eller adgangskode");
                 return response;
             }
 
-            // Generate token
             String token = UUID.randomUUID().toString();
 
-            // Return success response for Customer
             return new AuthResponseDTO(
                     customer.getId(),
                     customer.getEmail(),
@@ -82,23 +87,20 @@ public class AuthService {
             );
         }
 
-        // Try to find user in Admin table
+        // Prøv at finde brugeren i Admin-tabellen
         Optional<Admin> adminOpt = adminRepository.findByEmail(request.getEmail());
 
         if (adminOpt.isPresent()) {
             Admin admin = adminOpt.get();
 
-            // Check password
             if (!admin.getPassword().equals(request.getPassword())) {
                 AuthResponseDTO response = new AuthResponseDTO();
                 response.setMessage("Forkert email eller adgangskode");
                 return response;
             }
 
-            // Generate token
             String token = UUID.randomUUID().toString();
 
-            // Return success response for Admin
             return new AuthResponseDTO(
                     admin.getId(),
                     admin.getEmail(),
@@ -109,7 +111,6 @@ public class AuthService {
             );
         }
 
-        // User not found in either table
         AuthResponseDTO response = new AuthResponseDTO();
         response.setMessage("Forkert email eller adgangskode");
         return response;

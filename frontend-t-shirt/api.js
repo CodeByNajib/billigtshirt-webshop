@@ -236,13 +236,9 @@ const api = {
             if (!response.ok) {
                 const errorData = await response.json().catch(() => null);
                 console.error('Backend fejl ved checkout:', errorData);
-                
-                // Helpful error message for development
-                if (response.status === 500) {
-                    throw new Error('Backend endpoint ikke implementeret endnu. Se BACKEND_CHECKOUT_PROMPT.md for implementationsdetaljer.');
-                }
-                
-                throw new Error(errorData?.message || `HTTP ${response.status}`);
+                // Vi fjerner den gamle "ikke implementeret" fejl og sender 
+                // // den rigtige besked fra backenden videre
+                throw new Error(errorData?.message || `Fejl ved bestilling (Status ${response.status})`)
             }
             
             const result = await response.json();

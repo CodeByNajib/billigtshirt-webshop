@@ -1,9 +1,10 @@
 package dk.ss.backendtshirt.tshirt.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "order_gift")
+@Table(name = "order_gifts")
 public class OrderGift {
 
     @Id
@@ -13,6 +14,7 @@ public class OrderGift {
     // Denne binder gaven til ordren
     @ManyToOne
     @JoinColumn(name = "order_id")
+    @JsonBackReference
     private Order order;
 
     @Column(name = "gift_product_id")

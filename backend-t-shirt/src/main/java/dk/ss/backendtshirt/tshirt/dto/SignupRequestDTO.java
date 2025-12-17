@@ -5,15 +5,30 @@ public class SignupRequestDTO {
     private String lastname;
     private String email;
     private String password;
+    private String address;
+    private String city;
+    private String postalCode;
+    private String phone;
 
     public SignupRequestDTO() {
     }
 
-    public SignupRequestDTO(String firstname, String lastname, String email, String password) {
+    public SignupRequestDTO(String firstname,
+                            String lastname,
+                            String email,
+                            String password,
+                            String address,
+                            String city,
+                            String postalCode,
+                            String phone) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
         this.password = password;
+        this.address = address;
+        this.city = city;
+        this.postalCode = postalCode;
+        this.phone = phone;
     }
 
     public String getFirstname() {
@@ -46,6 +61,38 @@ public class SignupRequestDTO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }
 
