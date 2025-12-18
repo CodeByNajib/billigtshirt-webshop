@@ -91,10 +91,10 @@ INSERT INTO gift_config (id, threshold_amount, active, gift_product_id, created_
 
 -- Admin bruger (email: admin@tshirt.dk, password: admin123)
 INSERT INTO admin (id, email, name, password, created_at, updated_at) VALUES
-(1, 'admin@tshirt.dk', 'Administrator', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', NOW(), NOW()),
+(1, 'admin@tshirt.dk', 'Administrator', 'admin123', NOW(), NOW()),
 
 -- Test Admin (email: test@tshirt.dk, password: test123)
-(2, 'test@tshirt.dk', 'Test Administrator', '$2a$10$EblZqNptyYvcLm9VfqH.8uKEyTkKkOEhGj8FsZqnp89xqBEV/7Qe.', NOW(), NOW());
+(2, 'test@tshirt.dk', 'Test Administrator', 'test123', NOW(), NOW());
 
 
 -- ============================================
