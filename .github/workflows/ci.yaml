@@ -12,6 +12,7 @@ env:
 
 jobs:
   # --- JOB 1: TEST & COMPILE ---
+  # Dette job sikrer, at koden er korrekt, før den pakkes i docker-publisher
   build-and-test:
     runs-on: ubuntu-latest
     permissions:
@@ -42,40 +43,3 @@ jobs:
       - name: Run tests
         run: mvn test
         working-directory: backend-t-shirt
-
-  # --- JOB 2: BUILD & PUSH TO GHCR ---
-  package-and-push:
-    needs: build-and-test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1 # v3.0.0
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7 # v5.0.0
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=sha
-            latest
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@f2a1d5e99d037542a71f4388784d0847790a1618 # v5.0.0
-        with:
-          context: ./backend-t-shirt
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
