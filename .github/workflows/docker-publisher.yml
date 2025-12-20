@@ -51,7 +51,7 @@ jobs:
             type=sha,format=short
 
       - name: Build and push Backend
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./backend-t-shirt
           file: ./backend-t-shirt/Dockerfile
@@ -76,7 +76,7 @@ jobs:
             type=sha,format=short
 
       - name: Build and push Frontend
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./frontend-t-shirt
           file: ./frontend-t-shirt/Dockerfile
