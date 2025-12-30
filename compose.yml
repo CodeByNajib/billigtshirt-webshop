@@ -6,7 +6,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      # 1. Her er magien: Vi mapper din lokale mappe ind i containeren
+      # 1. Her er magien: Vi mapper den lokale mappe ind i containeren
       - ./backend-t-shirt/src/main/resources/db/migration:/flyway/sql
     environment:
       - SPRING_PROFILES_ACTIVE=prod

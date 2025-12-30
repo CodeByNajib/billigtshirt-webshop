@@ -1,0 +1,26 @@
+# Maven / build output
+target/
+*.log
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Node (hvis man har frontend filer liggende ved en fejl)
+node_modules/
+
+# Docker
+Dockerfile
+docker-compose.yml

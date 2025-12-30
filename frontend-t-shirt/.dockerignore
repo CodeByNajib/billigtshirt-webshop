@@ -1,0 +1,19 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Env (kopiér ikke hemmeligheder ind i image)
+.env
+.env.*
