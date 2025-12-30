@@ -4,7 +4,7 @@ on:
   push:
     # Kører kun build når der pushes til main
     branches: [ "main" ]
-  # Giver jer mulighed for at starte buildet manuelt under "Actions" fanen
+  # Giver mulighed for at starte buildet manuelt under "Actions" fanen
   workflow_dispatch:
 
 env:
