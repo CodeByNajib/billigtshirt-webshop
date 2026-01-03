@@ -1,10 +1,11 @@
 name: Frontend Publisher
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI-Pipeline - Billig T-Shirt"]
+    types:
+      - completed
     branches: [ "main" ]
-    paths:
-      - 'frontend-t-shirt/**' # VIGTIGT: Kører kun når denne mappe ændres
 
 env:
   REGISTRY: ghcr.io
@@ -12,6 +13,8 @@ env:
 
 jobs:
   publish-frontend:
+    # Denne linje er magien: Kør KUN hvis CI var en succes
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
