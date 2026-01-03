@@ -1,21 +1,19 @@
 services:
   app:
-    build:
-      context: ./backend-t-shirt
-      dockerfile: Dockerfile
+    # Henter backend-imaget fra GitHub Container Registry
+    image: ghcr.io/codebynajib/billigtshirt-webshop-backend:latest
     ports:
       - "8080:8080"
-    volumes:
-      # 1. Her er magien: Vi mapper den lokale mappe ind i containeren
-      - ./backend-t-shirt/src/main/resources/db/migration:/flyway/sql
+
+
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/billigtshirtdb?allowPublicKeyRetrieval=true&useSSL=false
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
 
-      # 2. Fortæl Flyway at den skal bruge fil-systemet (ikke classpath)
-      - SPRING_FLYWAY_LOCATIONS=filesystem:/flyway/sql
+      # 2. Fortæl Flyway at den skal lede inde i JAR-filen (classpath)
+      - SPRING_FLYWAY_LOCATIONS=classpath:db/migration
 
       # 3. Aktiver Flyway og bed Hibernate om at slappe af
       - SPRING_FLYWAY_ENABLED=true
@@ -30,13 +28,15 @@ services:
         condition: service_healthy
 
   frontend:
-     build: ./frontend-t-shirt
+    # Henter frontend-imaget fra GitHub Container Registry
+     image: ghcr.io/codebynajib/billigtshirt-webshop-frontend:latest
      container_name: frontend
      ports:
        - "80:80"
      depends_on:
        - app
   db:
+    # Specifik MySQL version (god praksis for stabilitet)
     image: mysql:8.0@sha256:0275a35e79c60caae68fac520602d9f6897feb9b0941a1471196b1a01760e581
     restart: always
     environment:
